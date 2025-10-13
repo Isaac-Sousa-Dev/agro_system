@@ -1,0 +1,17 @@
+# /sistema-agro/docker/php/Dockerfile
+
+FROM php:8.2-fpm-alpine
+
+# Instalar dependências necessárias para o Laravel e PostgreSQL
+RUN apk add --no-cache postgresql-dev \
+    && docker-php-ext-install pdo pdo_pgsql
+
+# Instalar o Composer (gerenciador de dependências do PHP)
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Define o diretório de trabalho
+WORKDIR /var/www/html
+
+# Altera o dono do diretório para o usuário www-data
+# (necessário para permissões de escrita do Laravel)
+RUN chown -R www-data:www-data /var/www/html

@@ -6,28 +6,25 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Produtor extends Model
+class Farmer extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'nome',
+        'name',
         'cpf_cnpj',
-        'telefone',
+        'phone',
         'email',
-        'endereco',
-        'data_cadastro',
+        'address',
+        'registration_date',
     ];
 
     protected $casts = [
-        'data_cadastro' => 'date',
+        'registration_date' => 'date',
     ];
 
-    /**
-     * Relacionamento com propriedades
-     */
-    public function propriedades(): HasMany
+    public function properties(): HasMany
     {
-        return $this->hasMany(Propriedade::class);
+        return $this->hasMany(Property::class);
     }
 }

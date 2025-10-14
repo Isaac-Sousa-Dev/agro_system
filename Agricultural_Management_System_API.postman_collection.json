@@ -1,0 +1,931 @@
+{
+	"info": {
+		"_postman_id": "agro-system-api",
+		"name": "Agricultural Management System API",
+		"description": "Complete API collection for the Agricultural Management System with Laravel 10 + Vue 3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "agro-system"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@agro.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticate user and get access token"
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New User\",\n    \"email\": \"newuser@agro.com\",\n    \"password\": \"password\",\n    \"password_confirmation\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"user"
+							]
+						},
+						"description": "Get authenticated user information"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Logout user and invalidate token"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for user login, registration, and logout"
+		},
+		{
+			"name": "Farmers",
+			"item": [
+				{
+					"name": "List Farmers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/farmers?page=1&search=&municipality=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"farmers"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "municipality",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get paginated list of farmers with optional search and filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Farmer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Maria Santos\",\n    \"cpf_cnpj\": \"98765432100\",\n    \"phone\": \"(11) 88888-8888\",\n    \"email\": \"maria@email.com\",\n    \"address\": \"Rua dos Campos, 456\",\n    \"registration_date\": \"2024-10-13\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/farmers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"farmers"
+							]
+						},
+						"description": "Create a new farmer"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Farmer",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/farmers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"farmers",
+								"1"
+							]
+						},
+						"description": "Get farmer details with properties, production units, and herds"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Farmer",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"João Silva Updated\",\n    \"cpf_cnpj\": \"12345678901\",\n    \"phone\": \"(11) 99999-9999\",\n    \"email\": \"joao.updated@email.com\",\n    \"address\": \"Rua das Flores, 123\",\n    \"registration_date\": \"2024-10-13\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/farmers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"farmers",
+								"1"
+							]
+						},
+						"description": "Update farmer information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Farmer",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/farmers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"farmers",
+								"1"
+							]
+						},
+						"description": "Delete farmer (will cascade delete properties, production units, and herds)"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operations for farmers management"
+		},
+		{
+			"name": "Properties",
+			"item": [
+				{
+					"name": "List Properties",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/properties?page=1&search=&municipality=&state=&farmer_id=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "municipality",
+									"value": ""
+								},
+								{
+									"key": "state",
+									"value": ""
+								},
+								{
+									"key": "farmer_id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get paginated list of properties with filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Property",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Fazenda Nova Vida\",\n    \"municipality\": \"Campinas\",\n    \"state\": \"SP\",\n    \"state_registration\": \"987654321\",\n    \"total_area\": 200.75,\n    \"farmer_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties"
+							]
+						},
+						"description": "Create a new property"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Property",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/properties/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"1"
+							]
+						},
+						"description": "Get property details with farmer, production units, and herds"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Property",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Fazenda São José Updated\",\n    \"municipality\": \"Ribeirão Preto\",\n    \"state\": \"SP\",\n    \"state_registration\": \"123456789\",\n    \"total_area\": 150.50,\n    \"farmer_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"1"
+							]
+						},
+						"description": "Update property information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Property",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/properties/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"1"
+							]
+						},
+						"description": "Delete property (will cascade delete production units and herds)"
+					},
+					"response": []
+				},
+				{
+					"name": "Export Properties",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/properties/export/excel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"export",
+								"excel"
+							]
+						},
+						"description": "Export properties to Excel file"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operations for properties management"
+		},
+		{
+			"name": "Production Units",
+			"item": [
+				{
+					"name": "List Production Units",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/production-units?page=1&property_id=&crop_name=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"production-units"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "property_id",
+									"value": ""
+								},
+								{
+									"key": "crop_name",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get paginated list of production units with filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Production Unit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"crop_name\": \"Watermelon Crimson Sweet\",\n    \"total_area_ha\": 25.75,\n    \"geographic_coordinates\": \"-22.9068,-47.0633\",\n    \"property_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/production-units",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"production-units"
+							]
+						},
+						"description": "Create a new production unit"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Production Unit",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/production-units/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"production-units",
+								"1"
+							]
+						},
+						"description": "Get production unit details with property information"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Production Unit",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"crop_name\": \"Orange Pear Updated\",\n    \"total_area_ha\": 60.25,\n    \"geographic_coordinates\": \"-21.1775,-47.8103\",\n    \"property_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/production-units/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"production-units",
+								"1"
+							]
+						},
+						"description": "Update production unit information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Production Unit",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/production-units/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"production-units",
+								"1"
+							]
+						},
+						"description": "Delete production unit"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operations for production units management"
+		},
+		{
+			"name": "Herds",
+			"item": [
+				{
+					"name": "List Herds",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/herds?page=1&property_id=&species=&purpose=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "property_id",
+									"value": ""
+								},
+								{
+									"key": "species",
+									"value": ""
+								},
+								{
+									"key": "purpose",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get paginated list of herds with filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Herd",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"species\": \"Goats\",\n    \"quantity\": 15,\n    \"purpose\": \"Milk Production\",\n    \"update_date\": \"2024-10-13\",\n    \"property_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/herds",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds"
+							]
+						},
+						"description": "Create a new herd"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Herd",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/herds/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds",
+								"1"
+							]
+						},
+						"description": "Get herd details with property information"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Herd",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"species\": \"Cattle\",\n    \"quantity\": 30,\n    \"purpose\": \"Meat Production\",\n    \"update_date\": \"2024-10-13\",\n    \"property_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/herds/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds",
+								"1"
+							]
+						},
+						"description": "Update herd information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Herd",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/herds/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds",
+								"1"
+							]
+						},
+						"description": "Delete herd"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operations for herds management"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

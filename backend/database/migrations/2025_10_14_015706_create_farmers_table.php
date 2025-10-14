@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rebanhos', function (Blueprint $table) {
+        Schema::create('farmers', function (Blueprint $table) {
             $table->id();
-            $table->string('especie');
-            $table->integer('quantidade');
-            $table->string('finalidade');
-            $table->date('data_atualizacao');
-            $table->foreignId('propriedade_id')->constrained('propriedades')->onDelete('cascade');
+            $table->string('name');
+            $table->string('cpf_cnpj')->unique();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->text('address')->nullable();
+            $table->date('registration_date');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rebanhos');
+        Schema::dropIfExists('farmers');
     }
 };

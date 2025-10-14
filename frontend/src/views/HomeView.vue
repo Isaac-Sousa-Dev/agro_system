@@ -11,7 +11,9 @@
 
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon">👨‍🌾</div>
+        <div class="stat-icon">
+          <i class="pi pi-users"></i>
+        </div>
         <div class="stat-content">
           <h3>Produtores</h3>
           <p class="stat-number">0</p>
@@ -20,7 +22,9 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🏡</div>
+        <div class="stat-icon">
+          <i class="pi pi-home"></i>
+        </div>
         <div class="stat-content">
           <h3>Propriedades</h3>
           <p class="stat-number">0</p>
@@ -29,7 +33,9 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🌾</div>
+        <div class="stat-icon">
+          <i class="pi pi-tree"></i>
+        </div>
         <div class="stat-content">
           <h3>Culturas</h3>
           <p class="stat-number">0</p>
@@ -38,7 +44,9 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🐄</div>
+        <div class="stat-icon">
+          <i class="pi pi-circle"></i>
+        </div>
         <div class="stat-content">
           <h3>Rebanhos</h3>
           <p class="stat-number">0</p>
@@ -71,22 +79,30 @@
       <h2>Funcionalidades do Sistema</h2>
       <div class="features-grid">
         <div class="feature">
-          <div class="feature-icon">📊</div>
+          <div class="feature-icon">
+            <i class="pi pi-chart-bar"></i>
+          </div>
           <h4>Relatórios Avançados</h4>
           <p>Total de propriedades por município, animais por espécie e hectares por cultura</p>
         </div>
         <div class="feature">
-          <div class="feature-icon">📤</div>
+          <div class="feature-icon">
+            <i class="pi pi-download"></i>
+          </div>
           <h4>Exportação</h4>
           <p>Exporte dados em Excel (.xlsx) e PDF para análise e compartilhamento</p>
         </div>
         <div class="feature">
-          <div class="feature-icon">🔍</div>
+          <div class="feature-icon">
+            <i class="pi pi-search"></i>
+          </div>
           <h4>Filtros e Busca</h4>
           <p>Filtros avançados por município, espécie, produtor e muito mais</p>
         </div>
         <div class="feature">
-          <div class="feature-icon">📱</div>
+          <div class="feature-icon">
+            <i class="pi pi-mobile"></i>
+          </div>
           <h4>Interface Responsiva</h4>
           <p>Acesse o sistema de qualquer dispositivo com design moderno</p>
         </div>

@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('produtores', function (Blueprint $table) {
+        Schema::create('production_units', function (Blueprint $table) {
             $table->id();
-            $table->string('nome');
-            $table->string('cpf_cnpj')->unique();
-            $table->string('telefone')->nullable();
-            $table->string('email')->nullable();
-            $table->text('endereco')->nullable();
-            $table->date('data_cadastro');
+            $table->string('crop_name');
+            $table->decimal('total_area_ha', 10, 2);
+            $table->string('geographic_coordinates')->nullable();
+            $table->foreignId('property_id')->constrained('properties')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('produtores');
+        Schema::dropIfExists('production_units');
     }
 };

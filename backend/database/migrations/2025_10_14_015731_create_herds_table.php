@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('unidades_producao', function (Blueprint $table) {
+        Schema::create('herds', function (Blueprint $table) {
             $table->id();
-            $table->string('nome_cultura');
-            $table->decimal('area_total_ha', 10, 2);
-            $table->string('coordenadas_geograficas')->nullable();
-            $table->foreignId('propriedade_id')->constrained('propriedades')->onDelete('cascade');
+            $table->string('species');
+            $table->integer('quantity');
+            $table->string('purpose');
+            $table->date('update_date');
+            $table->foreignId('property_id')->constrained('properties')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('unidades_producao');
+        Schema::dropIfExists('herds');
     }
 };

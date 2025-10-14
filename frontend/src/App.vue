@@ -1,33 +1,78 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import Sidebar from '@/components/Sidebar.vue'
+
+const { isAuthenticated } = useAuth()
+const sidebarOpen = ref(false)
+
+const showSidebar = computed(() => {
+  return isAuthenticated.value && window.location.pathname !== '/login'
+})
+
+// Toggle sidebar no mobile
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
+}
+
+// Fechar sidebar quando clicar fora (mobile)
+const closeSidebar = () => {
+  sidebarOpen.value = false
+}
+
+// Verificar se é mobile
+const isMobile = ref(false)
+const checkIsMobile = () => {
+  isMobile.value = window.innerWidth < 768
+}
+
+onMounted(() => {
+  checkIsMobile()
+  window.addEventListener('resize', checkIsMobile)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIsMobile)
+})
 </script>
 
 <template>
   <div id="app">
-    <header class="header">
-      <div class="container">
-        <div class="header-content">
-          <div class="logo">
-            <h1>🌱 Agro System</h1>
-            <p>Sistema de Gestão Agropecuária</p>
-          </div>
-          <nav class="nav">
-            <router-link to="/" class="nav-link">Dashboard</router-link>
-            <router-link to="/produtores" class="nav-link">Produtores</router-link>
-            <router-link to="/propriedades" class="nav-link">Propriedades</router-link>
-            <router-link to="/relatorios" class="nav-link">Relatórios</router-link>
-          </nav>
-        </div>
+    <!-- Sidebar -->
+    <Sidebar 
+      v-if="showSidebar" 
+      :is-open="sidebarOpen"
+      @close="closeSidebar"
+    />
+
+    <!-- Header para mobile -->
+    <header v-if="showSidebar && isMobile" class="mobile-header">
+      <button @click="toggleSidebar" class="menu-toggle">
+        <i class="pi pi-bars"></i>
+      </button>
+      <div class="mobile-logo">
+        <i class="pi pi-seedling"></i>
+        <h1>Agro System</h1>
       </div>
+      <div class="mobile-spacer"></div>
     </header>
 
-    <main class="main">
-      <div class="container">
+    <!-- Conteúdo principal -->
+    <main class="main" :class="{ 
+      'with-sidebar': showSidebar && !isMobile,
+      'with-mobile-header': showSidebar && isMobile
+    }">
+      <div v-if="showSidebar" class="container">
+        <RouterView />
+      </div>
+      <div v-else>
         <RouterView />
       </div>
     </main>
 
-    <footer class="footer">
+    <!-- Footer -->
+    <footer v-if="showSidebar" class="footer">
       <div class="container">
         <p>&copy; 2024 Agro System - Sistema de Gestão Agropecuária</p>
       </div>
@@ -36,65 +81,94 @@ import { RouterView } from 'vue-router'
 </template>
 
 <style scoped>
-.header {
+/* Header Mobile */
+.mobile-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
   color: white;
-  padding: 1rem 0;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 1001;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.header-content {
+.menu-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: background-color 0.2s;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
-.logo h1 {
+.menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mobile-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobile-logo h1 {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 700;
 }
 
-.logo p {
-  margin: 0;
-  font-size: 0.9rem;
-  opacity: 0.9;
+.mobile-logo i {
+  font-size: 1.5rem;
 }
 
-.nav {
-  display: flex;
-  gap: 1.5rem;
+.mobile-spacer {
+  flex: 1;
 }
 
-.nav-link {
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  transition: background-color 0.2s;
-}
-
-.nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.nav-link.router-link-active {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
+/* Layout Principal */
 .main {
-  min-height: calc(100vh - 140px);
-  padding: 2rem 0;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
 }
 
+.main.with-sidebar {
+  margin-left: 280px;
+}
+
+.main.with-mobile-header {
+  padding-top: 80px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Footer */
 .footer {
   background-color: #374151;
   color: white;
   text-align: center;
-  padding: 1rem 0;
+  padding: 1rem;
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
+}
+
+.main.with-sidebar + .footer {
+  margin-left: 280px;
 }
 
 .footer p {
@@ -102,19 +176,34 @@ import { RouterView } from 'vue-router'
   font-size: 0.875rem;
 }
 
+/* Responsividade */
 @media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    text-align: center;
+  .main.with-sidebar {
+    margin-left: 0;
   }
   
-  .nav {
-    justify-content: center;
-    flex-wrap: wrap;
+  .main.with-sidebar + .footer {
+    margin-left: 0;
   }
   
-  .logo h1 {
-    font-size: 1.5rem;
+  .container {
+    padding: 1rem;
   }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.main {
+  animation: fadeIn 0.5s ease;
 }
 </style>

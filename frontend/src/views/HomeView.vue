@@ -4,9 +4,10 @@
 
 <template>
   <div class="dashboard">
-    <div class="welcome-section">
-      <h1>Bem-vindo ao Agro System</h1>
-      <p>Gerencie sua propriedade rural de forma eficiente e organizada</p>
+    <!-- Teste com classes Tailwind -->
+    <div class="text-black py-6">
+      <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
+      <p class="text-gray-500">Gerencie sua propriedade rural de forma eficiente e organizada</p>
     </div>
 
     <div class="stats-grid">
@@ -118,7 +119,7 @@
   padding: 2rem 0;
 }
 
-.welcome-section {
+/* .welcome-section {
   text-align: center;
   margin-bottom: 3rem;
   padding: 2rem;
@@ -138,7 +139,7 @@
   font-size: 1.2rem;
   color: #047857;
   margin: 0;
-}
+} */
 
 .stats-grid {
   display: grid;
@@ -273,22 +274,22 @@
 }
 
 @media (max-width: 768px) {
-  .welcome-section h1 {
+  /* .welcome-section h1 {
     font-size: 2rem;
   }
-  
+
   .welcome-section p {
     font-size: 1rem;
-  }
-  
+  } */
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .actions-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .features-grid {
     grid-template-columns: 1fr;
   }

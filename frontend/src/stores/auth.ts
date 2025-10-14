@@ -80,6 +80,7 @@ export const useAuthStore = defineStore('auth', () => {
       api.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
       const response = await api.get('/auth/me')
       user.value = response.data
+      console.log(user.value, 'user')
       return true
     } catch (err) {
       // Token is invalid, clear it

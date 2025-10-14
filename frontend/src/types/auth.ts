@@ -4,7 +4,9 @@ export interface User {
   email: string
   email_verified_at?: string
   created_at: string
-  updated_at: string
+  updated_at: string,
+  avatar?: string,
+  user?: User | null
 }
 
 export interface LoginCredentials {
@@ -18,7 +20,7 @@ export interface LoginResponse {
   message?: string
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T
   message?: string
   success: boolean

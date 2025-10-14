@@ -90,3 +90,8 @@ body {
 .btn-danger:hover {
   background-color: #b91c1c;
 }
+
+/* Tailwind CSS - Deve vir por último para ter prioridade */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

@@ -4,9 +4,9 @@
 
 <template>
   <div class="page">
-    <div class="page-header">
-      <h1>👨‍🌾 Produtores</h1>
-      <p>Gerencie os produtores rurais cadastrados</p>
+    <div class="text-black py-6">
+      <h1 class="text-3xl font-bold mb-2">Produtores</h1>
+      <p class="text-gray-500">Gerencie os produtores rurais cadastrados</p>
     </div>
 
     <div class="page-content">

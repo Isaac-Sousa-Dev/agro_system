@@ -2,60 +2,39 @@
   <aside class="sidebar" :class="{ 'sidebar-collapsed': collapsed }">
     <!-- Header da Sidebar -->
     <div class="sidebar-header">
-    <div class="logo-section">
-      <div class="logo-icon">
-        <i class="pi pi-seedling"></i>
+      <div class="logo-section">
+        <div class="logo-icon">
+          <i class="pi pi-seedling"></i>
+        </div>
+        <div v-if="!collapsed" class="logo-text">
+          <h2>Agro System</h2>
+          <p>Sistema de Gestão</p>
+        </div>
       </div>
-      <div v-if="!collapsed" class="logo-text">
-        <h2>Agro System</h2>
-        <p>Sistema de Gestão</p>
-      </div>
-    </div>
-      <!-- <button 
-        @click="toggleCollapse" 
-        class="toggle-button"
-        :title="collapsed ? 'Expandir menu' : 'Recolher menu'"
-      >
-        <span class="toggle-icon">{{ collapsed ? '▶' : '◀' }}</span>
-      </button> -->
+
     </div>
 
     <!-- Seção de Perfil do Usuário -->
     <div class="profile-section">
       <div class="profile-info">
         <div class="profile-avatar">
-          <img 
-            v-if="user?.avatar" 
-            :src="user.avatar" 
-            :alt="user.name"
-            class="avatar-image"
-          >
+          <img v-if="user?.avatar" :src="user.avatar" :alt="user.name" class="avatar-image">
           <div v-else class="avatar-placeholder">
-            <!-- {{ userInitials }} -->
+            {{ user?.name?.charAt(0) || 'U' }}
           </div>
         </div>
         <div v-if="!collapsed" class="profile-details">
-          <h3 class="profile-name">{{ user?.name }}</h3>
-          <p class="profile-email">{{ user?.email }}</p>
+          <h3 class="profile-name">{{ user?.name || 'Usuário' }}</h3>
+          <p class="profile-email">{{ user?.email || 'email@exemplo.com' }}</p>
         </div>
       </div>
-      <button 
-        v-if="!collapsed"
-        @click="logout" 
-        class="logout-button"
-        title="Sair do sistema"
-      >
+      <button v-if="!collapsed" @click="logout" class="logout-button" title="Sair do sistema">
         <span class="logout-icon">
           <i class="pi pi-sign-out"></i>
         </span>
         <span>Sair</span>
       </button>
-      <button 
-        v-else
-        @click="logout" 
-        class="logout-button-collapsed"
-        title="Sair do sistema"
-      >
+      <button v-else @click="logout" class="logout-button-collapsed" title="Sair do sistema">
         <i class="pi pi-sign-out"></i>
       </button>
     </div>
@@ -71,7 +50,7 @@
             <span v-if="!collapsed" class="nav-text">Dashboard</span>
           </router-link>
         </li>
-        
+
         <li class="nav-item">
           <router-link to="/produtores" class="nav-link" :title="collapsed ? 'Produtores Rurais' : ''">
             <span class="nav-icon">
@@ -80,7 +59,7 @@
             <span v-if="!collapsed" class="nav-text">Produtor Rural</span>
           </router-link>
         </li>
-        
+
         <li class="nav-item">
           <router-link to="/propriedades" class="nav-link" :title="collapsed ? 'Propriedades' : ''">
             <span class="nav-icon">
@@ -89,7 +68,7 @@
             <span v-if="!collapsed" class="nav-text">Propriedade</span>
           </router-link>
         </li>
-        
+
         <li class="nav-item">
           <router-link to="/unidades-producao" class="nav-link" :title="collapsed ? 'Unidades de Produção' : ''">
             <span class="nav-icon">
@@ -98,7 +77,7 @@
             <span v-if="!collapsed" class="nav-text">Unidade de Produção</span>
           </router-link>
         </li>
-        
+
         <li class="nav-item">
           <router-link to="/rebanhos" class="nav-link" :title="collapsed ? 'Rebanhos' : ''">
             <span class="nav-icon">
@@ -107,7 +86,7 @@
             <span v-if="!collapsed" class="nav-text">Rebanho</span>
           </router-link>
         </li>
-        
+
         <li class="nav-item">
           <router-link to="/relatorios" class="nav-link" :title="collapsed ? 'Relatórios' : ''">
             <span class="nav-icon">
@@ -127,15 +106,12 @@
   </aside>
 
   <!-- Overlay para mobile -->
-  <div 
-    v-if="isMobile && !collapsed" 
-    class="sidebar-overlay" 
-    @click="collapseSidebar"
-  ></div>
+  <div v-if="isMobile && !collapsed" class="sidebar-overlay" @click="collapseSidebar"></div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 
 const { user, logout } = useAuth()
@@ -186,6 +162,7 @@ watch(() => props.isOpen, (newValue) => {
 // Event listeners
 onMounted(() => {
   checkIsMobile()
+  console.log(user.value, 'user on mount')
   window.addEventListener('resize', checkIsMobile)
 })
 
@@ -486,11 +463,11 @@ onUnmounted(() => {
     transform: translateX(-100%);
     transition: transform 0.3s ease;
   }
-  
+
   .sidebar:not(.sidebar-collapsed) {
     transform: translateX(0);
   }
-  
+
   .sidebar-collapsed {
     transform: translateX(-100%);
     width: 280px;
@@ -502,6 +479,7 @@ onUnmounted(() => {
   from {
     transform: translateX(-100%);
   }
+
   to {
     transform: translateX(0);
   }

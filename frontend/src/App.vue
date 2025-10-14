@@ -8,7 +8,7 @@ const { isAuthenticated } = useAuth()
 const sidebarOpen = ref(false)
 
 const showSidebar = computed(() => {
-  return isAuthenticated.value && window.location.pathname !== '/login'
+  return isAuthenticated.value
 })
 
 // Toggle sidebar no mobile
@@ -39,14 +39,13 @@ onUnmounted(() => {
 
 <template>
   <div id="app">
-    <!-- Sidebar -->
-    <Sidebar 
-      v-if="showSidebar" 
+
+    <Sidebar
+      v-if="showSidebar"
       :is-open="sidebarOpen"
       @close="closeSidebar"
     />
 
-    <!-- Header para mobile -->
     <header v-if="showSidebar && isMobile" class="mobile-header">
       <button @click="toggleSidebar" class="menu-toggle">
         <i class="pi pi-bars"></i>
@@ -58,15 +57,15 @@ onUnmounted(() => {
       <div class="mobile-spacer"></div>
     </header>
 
-    <!-- Conteúdo principal -->
-    <main class="main" :class="{ 
-      'with-sidebar': showSidebar && !isMobile,
-      'with-mobile-header': showSidebar && isMobile
-    }">
+    <main class="main" :class="{
+        'with-sidebar': showSidebar && !isMobile,
+        'with-mobile-header': showSidebar && isMobile
+      }"
+    >
       <div v-if="showSidebar" class="container">
         <RouterView />
       </div>
-      <div v-else>
+      <div v-else class="container">
         <RouterView />
       </div>
     </main>
@@ -181,11 +180,11 @@ onUnmounted(() => {
   .main.with-sidebar {
     margin-left: 0;
   }
-  
+
   .main.with-sidebar + .footer {
     margin-left: 0;
   }
-  
+
   .container {
     padding: 1rem;
   }

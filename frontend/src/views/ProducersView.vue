@@ -89,10 +89,10 @@ import type { Producer } from '@/types/producer'
 import InputText from 'primevue/inputtext';
 import Paginator from 'primevue/paginator'
 import type { Property } from '@/types/property';
-import ProducerCreateModal from '@/components/modals/ProducerCreateModal.vue'
-import ProducerEditModal from '@/components/modals/ProducerEditModal.vue'
-import ProducerViewModal from '@/components/modals/ProducerViewModal.vue'
-import ProducerDeleteModal from '@/components/modals/ProducerDeleteModal.vue'
+import ProducerCreateModal from '@/components/modals/producer/ProducerCreateModal.vue'
+import ProducerEditModal from '@/components/modals/producer/ProducerEditModal.vue'
+import ProducerViewModal from '@/components/modals/producer/ProducerViewModal.vue'
+import ProducerDeleteModal from '@/components/modals/producer/ProducerDeleteModal.vue'
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 
@@ -164,7 +164,7 @@ function resetForm() {
 async function load() {
   try {
     await store.list()
-    toast.add({ severity: 'success', summary: 'Produtores', detail: 'Lista atualizada', life: 2000 })
+    // toast.add({ severity: 'success', summary: 'Produtores', detail: 'Lista atualizada', life: 2000 })
   } catch {
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar produtores', life: 3000 })
   }

@@ -1,142 +1,28 @@
-<script setup lang="ts">
-import { onMounted, reactive, ref, computed } from 'vue'
-import { useToast } from 'primevue/usetoast'
-import { usePropertyStore } from '@/stores/property'
-import type { Property } from '@/types/property'
-
-const store = usePropertyStore()
-const toast = useToast()
-const search = ref('')
-const showCreate = ref(false)
-const showEdit = ref(false)
-const showView = ref(false)
-const showConfirmDelete = ref(false)
-
-const form = reactive<Omit<Property, 'id' | 'created_at' | 'updated_at'>>({
-  farmer_id: 0,
-  name: '',
-  municipality: '',
-  state: '',
-  state_registration: '',
-  total_area: 0
-})
-
-const selected = ref<Property | null>(null)
-
-const filtered = computed(() => {
-  if (!search.value) return store.properties
-  const q = search.value.toLowerCase()
-  return store.properties.filter(p =>
-    p.name.toLowerCase().includes(q) ||
-    p.municipality.toLowerCase().includes(q) ||
-    p.state.toLowerCase().includes(q)
-  )
-})
-
-function resetForm() {
-  form.farmer_id = 0
-  form.name = ''
-  form.municipality = ''
-  form.state = ''
-  form.state_registration = ''
-  form.total_area = 0
-}
-
-async function load() {
-  try {
-    await store.list()
-    toast.add({ severity: 'success', summary: 'Propriedades', detail: 'Lista atualizada', life: 2000 })
-  } catch (e) {
-    console.error(e)
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar propriedades', life: 3000 })
-  }
-}
-
-function openCreate() {
-  resetForm()
-  showCreate.value = true
-}
-
-function openView(item: Property) {
-  selected.value = item
-  showView.value = true
-}
-
-function openEdit(item: Property) {
-  selected.value = item
-  form.farmer_id   = item.farmer_id
-  form.name = item.name
-  form.municipality = item.municipality
-  form.state = item.state
-  form.state_registration = item.state_registration ?? ''
-  form.total_area = item.total_area
-  showEdit.value = true
-}
-
-function openDelete(item: Property) {
-  selected.value = item
-  showConfirmDelete.value = true
-}
-
-async function submitCreate() {
-  try {
-    await store.create({ ...form })
-    toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Criada com sucesso', life: 2500 })
-    showCreate.value = false
-    resetForm()
-  } catch (e) {
-    console.error(e)
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar propriedade', life: 3000 })
-  }
-}
-
-async function submitEdit() {
-  if (!selected.value) return
-  try {
-    await store.update(selected.value.id, { ...form })
-    toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Atualizada com sucesso', life: 2500 })
-    showEdit.value = false
-  } catch (e) {
-    console.error(e)
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar propriedade', life: 3000 })
-  }
-}
-
-async function confirmDelete() {
-  if (!selected.value) return
-  try {
-    await store.remove(selected.value.id)
-    toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Excluída com sucesso', life: 2500 })
-    showConfirmDelete.value = false
-  } catch (e) {
-    console.error(e)
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir propriedade', life: 3000 })
-  }
-}
-
-onMounted(load)
-</script>
-
 <template>
   <div class="page">
-    <div class="page-header">
-      <h1>🏡 Propriedades</h1>
-      <p>Gerencie as propriedades rurais e suas informações</p>
+    <div class="text-black py-6">
+      <h1 class="text-3xl font-bold mb-2">Propriedades</h1>
+      <p class="text-gray-500">Gerencie as propriedades rurais e suas informações</p>
     </div>
 
-    <div class="toolbar">
-      <div class="left">
+    <div class="flex justify-between items-center mb-4">
+      <div class="w-full">
         <button class="btn-primary" @click="openCreate">
           <span class="btn-icon"><i class="pi pi-plus"></i></span>
           Nova Propriedade
         </button>
       </div>
-      <div class="right">
-        <input class="input" v-model="search" placeholder="Buscar por nome, município, UF..." />
-        <button class="btn-secondary" @click="load">
-          <i class="pi pi-refresh"></i>
-        </button>
-      </div>
+        <div class="w-full flex gap-2">
+          <InputGroup>
+              <InputText fluid type="text" v-model="search" placeholder="Buscar por nome, município, UF..." />
+              <InputGroupAddon>
+                  <span class="pi pi-search"></span>
+              </InputGroupAddon>
+          </InputGroup>
+          <button class="btn-secondary" @click="load">
+            <i class="pi pi-refresh"></i>
+          </button>
+        </div>
     </div>
 
     <div class="table-card">
@@ -174,6 +60,12 @@ onMounted(load)
           </tr>
         </tbody>
       </table>
+      <Paginator
+        :first="(store.currentPage - 1) * store.perPage"
+        :rows="store.perPage"
+        :totalRecords="store.total"
+        @page="onPage"
+      />
     </div>
 
     <!-- Criar -->
@@ -283,6 +175,134 @@ onMounted(load)
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { onMounted, reactive, ref, computed } from 'vue'
+import { useToast } from 'primevue/usetoast'
+import { usePropertyStore } from '@/stores/property'
+import type { Property } from '@/types/property'
+import InputText from 'primevue/inputtext';
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
+import Paginator from 'primevue/paginator'
+
+const store = usePropertyStore()
+const toast = useToast()
+const search = ref('')
+const showCreate = ref(false)
+const showEdit = ref(false)
+const showView = ref(false)
+const showConfirmDelete = ref(false)
+
+const form = reactive<Omit<Property, 'id' | 'created_at' | 'updated_at'>>({
+  farmer_id: 0,
+  name: '',
+  municipality: '',
+  state: '',
+  state_registration: '',
+  total_area: 0
+})
+
+const selected = ref<Property | null>(null)
+
+const filtered = computed(() => {
+  if (!search.value) return store.properties
+  const q = search.value.toLowerCase()
+  return store.properties.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    p.municipality.toLowerCase().includes(q) ||
+    p.state.toLowerCase().includes(q)
+  )
+})
+
+async function onPage(event: { first: number; rows: number; page: number }) {
+  const nextPage = (event.page ?? 0) + 1
+  await store.list(nextPage, event.rows)
+}
+
+function resetForm() {
+  form.farmer_id = 0
+  form.name = ''
+  form.municipality = ''
+  form.state = ''
+  form.state_registration = ''
+  form.total_area = 0
+}
+
+async function load() {
+  try {
+    await store.list()
+    // toast.add({ severity: 'success', summary: 'Propriedades', detail: 'Lista atualizada', life: 2000 })
+  } catch (e) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar propriedades', life: 3000 })
+  }
+}
+
+function openCreate() {
+  resetForm()
+  showCreate.value = true
+}
+
+function openView(item: Property) {
+  selected.value = item
+  showView.value = true
+}
+
+function openEdit(item: Property) {
+  selected.value = item
+  form.farmer_id   = item.farmer_id
+  form.name = item.name
+  form.municipality = item.municipality
+  form.state = item.state
+  form.state_registration = item.state_registration ?? ''
+  form.total_area = item.total_area
+  showEdit.value = true
+}
+
+function openDelete(item: Property) {
+  selected.value = item
+  showConfirmDelete.value = true
+}
+
+async function submitCreate() {
+  try {
+    await store.create({ ...form })
+    toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Criada com sucesso', life: 2500 })
+    showCreate.value = false
+    resetForm()
+  } catch (e) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar propriedade', life: 3000 })
+  }
+}
+
+async function submitEdit() {
+  if (!selected.value) return
+  try {
+    await store.update(selected.value.id, { ...form })
+    toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Atualizada com sucesso', life: 2500 })
+    showEdit.value = false
+  } catch (e) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar propriedade', life: 3000 })
+  }
+}
+
+async function confirmDelete() {
+  if (!selected.value) return
+  try {
+    await store.remove(selected.value.id)
+    toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Excluída com sucesso', life: 2500 })
+    showConfirmDelete.value = false
+  } catch (e) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir propriedade', life: 3000 })
+  }
+}
+
+onMounted(load)
+</script>
 
 <style scoped>
 .page {

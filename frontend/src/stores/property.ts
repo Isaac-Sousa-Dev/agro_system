@@ -1,7 +1,7 @@
 import api from "@/services/api";
-import type { Property } from "@/types/property";
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import type { Property } from "@/types/property";
 
 export const usePropertyStore = defineStore('property', () => {
   const quantityProperties = ref<number>(0);
@@ -9,17 +9,39 @@ export const usePropertyStore = defineStore('property', () => {
   const properties = ref<Property[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const currentPage = ref<number>(1);
+  const lastPage = ref<number>(1);
+  const perPage = ref<number>(6);
+  const total = ref<number>(0);
+  const links = ref<Array<{ url: string, label: string, active: boolean}>>([])
 
-  const list = async () => {
+  const list = async (page = 1, per: number = perPage.value) => {
     loading.value = true;
     error.value = null;
     try {
       const response = await api.get('/properties');
-      properties.value = response.data.data ?? response.data;
+      const payload = response.data;
+
+      if(payload && Array.isArray(payload.data)) {
+        properties.value = payload.data;
+        currentPage.value = payload.current_page ?? page;
+        lastPage.value = payload.last_page ?? 1;
+        perPage.value = Number(payload.per_page ?? per ?? payload.data.length ?? 0);
+        total.value = Number(payload.total ?? payload.data.length ?? 0);
+        links.value = payload.links ?? [];
+      } else {
+        properties.value = payload;
+        currentPage.value = 1;
+        lastPage.value = 1;
+        perPage.value = payload?.length ?? 0;
+        total.value = payload?.length ?? 0;
+        links.value = [];
+      }
+
       quantityProperties.value = properties.value.length;
       return properties.value;
-    } catch (err: any) {
-      error.value = err?.message ?? 'Falha ao carregar propriedades';
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Falha ao carregar propriedades';
       throw err;
     } finally {
       loading.value = false;
@@ -33,8 +55,8 @@ export const usePropertyStore = defineStore('property', () => {
       const response = await api.get(`/properties/${id}`);
       property.value = response.data.data ?? response.data;
       return property.value;
-    } catch (err: any) {
-      error.value = err?.message ?? 'Falha ao buscar propriedade';
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Falha ao buscar propriedade';
       throw err;
     } finally {
       loading.value = false;
@@ -50,8 +72,8 @@ export const usePropertyStore = defineStore('property', () => {
       properties.value.unshift(created);
       quantityProperties.value = properties.value.length;
       return created;
-    } catch (err: any) {
-      error.value = err?.message ?? 'Falha ao criar propriedade';
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Falha ao criar propriedade';
       throw err;
     } finally {
       loading.value = false;
@@ -68,8 +90,8 @@ export const usePropertyStore = defineStore('property', () => {
       if (index !== -1) properties.value[index] = updated;
       if (property.value?.id === id) property.value = updated;
       return updated;
-    } catch (err: any) {
-      error.value = err?.message ?? 'Falha ao atualizar propriedade';
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Falha ao atualizar propriedade';
       throw err;
     } finally {
       loading.value = false;
@@ -84,8 +106,8 @@ export const usePropertyStore = defineStore('property', () => {
       properties.value = properties.value.filter(p => p.id !== id);
       quantityProperties.value = properties.value.length;
       if (property.value?.id === id) property.value = null;
-    } catch (err: any) {
-      error.value = err?.message ?? 'Falha ao excluir propriedade';
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Falha ao excluir propriedade';
       throw err;
     } finally {
       loading.value = false;
@@ -103,5 +125,10 @@ export const usePropertyStore = defineStore('property', () => {
     quantityProperties,
     loading,
     error,
+    currentPage,
+    lastPage,
+    perPage,
+    total,
+    links,
   };
 })

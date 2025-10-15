@@ -5,12 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Property;
 use Illuminate\Http\JsonResponse;
+use App\Services\PropertyService;
 
 class PropertyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    private $propertyService;
+
+    public function __construct(PropertyService $propertyService)
+    {
+        $this->propertyService = $propertyService;
+    }
+
     public function index(Request $request): JsonResponse
     {
         $query = Property::with(['farmer', 'productionUnits', 'herds']);

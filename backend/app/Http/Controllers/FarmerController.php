@@ -65,7 +65,6 @@ class FarmerController extends Controller
 
     public function update(FormRequest $request, Farmer $farmer): JsonResponse
     {
-
         try {
             $properties = $request->properties;
             $farmer = $this->farmerService->update($request->all(), $farmer->id, $properties);
@@ -85,7 +84,15 @@ class FarmerController extends Controller
 
     public function destroy(Farmer $farmer): JsonResponse
     {
-        $farmer->delete();
+
+        try {
+            $farmer = $this->farmerService->delete($farmer->id);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Farmer not deleted',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
         return response()->json([
             'message' => 'Farmer deleted successfully'

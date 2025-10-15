@@ -17,33 +17,33 @@ const router = createRouter({
       meta: { requiresGuest: true }
     },
     {
-      path: '/produtores',
-      name: 'produtores',
-      component: () => import('../views/ProdutoresView.vue'),
+      path: '/producers',
+      name: 'producers',
+      component: () => import('../views/ProducersView.vue'),
       meta: { requiresAuth: true }
     },
     {
-      path: '/propriedades',
-      name: 'propriedades',
-      component: () => import('../views/PropriedadesView.vue'),
+      path: '/properties',
+      name: 'properties',
+      component: () => import('../views/PropertiesView.vue'),
       meta: { requiresAuth: true }
     },
     {
-      path: '/unidades-producao',
-      name: 'unidades-producao',
-      component: () => import('../views/UnidadesProducaoView.vue'),
+      path: '/production-units',
+      name: 'production-units',
+      component: () => import('../views/ProductionUnitsView.vue'),
       meta: { requiresAuth: true }
     },
     {
-      path: '/rebanhos',
-      name: 'rebanhos',
-      component: () => import('../views/RebanhosView.vue'),
+      path: '/herds',
+      name: 'herds',
+      component: () => import('../views/HerdsView.vue'),
       meta: { requiresAuth: true }
     },
     {
-      path: '/relatorios',
-      name: 'relatorios',
-      component: () => import('../views/RelatoriosView.vue'),
+      path: '/reports',
+      name: 'reports',
+      component: () => import('../views/ReportsView.vue'),
       meta: { requiresAuth: true }
     },
     {
@@ -57,26 +57,22 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
-  console.log(authStore.isAuthenticated, 'isAuthenticated')
-  // Check if user is authenticated
   if (to.meta.requiresAuth) {
     if (!authStore.isAuthenticated) {
-      // Try to fetch user with stored token
       const hasValidToken = await authStore.fetchUser()
-      
+
       if (!hasValidToken) {
         next('/login')
         return
       }
     }
   }
-  
-  // Redirect authenticated users away from login page
+
   if (to.meta.requiresGuest && authStore.isAuthenticated) {
     next('/dashboard')
     return
   }
-  
+
   next()
 })
 

@@ -68,7 +68,7 @@ Route::get('/', function () {
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
-    
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
@@ -80,14 +80,14 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     // Farmers
     Route::apiResource('farmers', FarmerController::class);
-    
+
     // Properties
     Route::apiResource('properties', PropertyController::class);
     Route::get('/properties/export/excel', [PropertyController::class, 'export']);
-    
+
     // Production Units
     Route::apiResource('production-units', ProductionUnitController::class);
-    
+
     // Herds
     Route::apiResource('herds', HerdController::class);
 });

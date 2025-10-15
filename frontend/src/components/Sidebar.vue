@@ -3,9 +3,9 @@
     <!-- Header da Sidebar -->
     <div class="sidebar-header">
       <div class="logo-section">
-        <div class="logo-icon">
+        <!-- <div class="logo-icon">
           <i class="pi pi-seedling"></i>
-        </div>
+        </div> -->
         <div v-if="!collapsed" class="logo-text">
           <h2>Agro System</h2>
           <p>Sistema de Gestão</p>
@@ -52,7 +52,7 @@
         </li>
 
         <li class="nav-item">
-          <router-link to="/produtores" class="nav-link" :title="collapsed ? 'Produtores Rurais' : ''">
+          <router-link to="/producers" class="nav-link" :title="collapsed ? 'Produtores Rurais' : ''">
             <span class="nav-icon">
               <i class="pi pi-users"></i>
             </span>
@@ -61,7 +61,7 @@
         </li>
 
         <li class="nav-item">
-          <router-link to="/propriedades" class="nav-link" :title="collapsed ? 'Propriedades' : ''">
+          <router-link to="/properties" class="nav-link" :title="collapsed ? 'Propriedades' : ''">
             <span class="nav-icon">
               <i class="pi pi-home"></i>
             </span>
@@ -70,16 +70,16 @@
         </li>
 
         <li class="nav-item">
-          <router-link to="/unidades-producao" class="nav-link" :title="collapsed ? 'Unidades de Produção' : ''">
+          <router-link to="/production-units" class="nav-link" :title="collapsed ? 'Unidades de Produção' : ''">
             <span class="nav-icon">
-              <i class="pi pi-tree"></i>
+              <i class="pi pi-sort-amount-up"></i>
             </span>
             <span v-if="!collapsed" class="nav-text">Unidade de Produção</span>
           </router-link>
         </li>
 
         <li class="nav-item">
-          <router-link to="/rebanhos" class="nav-link" :title="collapsed ? 'Rebanhos' : ''">
+          <router-link to="/herds" class="nav-link" :title="collapsed ? 'Rebanhos' : ''">
             <span class="nav-icon">
               <i class="pi pi-circle"></i>
             </span>
@@ -88,7 +88,7 @@
         </li>
 
         <li class="nav-item">
-          <router-link to="/relatorios" class="nav-link" :title="collapsed ? 'Relatórios' : ''">
+          <router-link to="/reports" class="nav-link" :title="collapsed ? 'Relatórios' : ''">
             <span class="nav-icon">
               <i class="pi pi-file"></i>
             </span>

@@ -1,7 +1,3 @@
-<script setup lang="ts">
-// Dashboard principal do sistema agropecuário
-</script>
-
 <template>
   <div class="dashboard">
     <!-- Teste com classes Tailwind -->
@@ -17,7 +13,7 @@
         </div>
         <div class="stat-content">
           <h3>Produtores</h3>
-          <p class="stat-number">0</p>
+          <p class="stat-number">{{ quantityProducersValue }}</p>
           <p class="stat-label">Cadastrados</p>
         </div>
       </div>
@@ -28,7 +24,7 @@
         </div>
         <div class="stat-content">
           <h3>Propriedades</h3>
-          <p class="stat-number">0</p>
+          <p class="stat-number">{{ quantityPropertiesValue }}</p>
           <p class="stat-label">Registradas</p>
         </div>
       </div>
@@ -112,34 +108,36 @@
   </div>
 </template>
 
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { useProducerStore } from '@/stores/producer';
+import { usePropertyStore } from '@/stores/property';
+import type { Property } from '@/types/property';
+import type { Producer } from '@/types/producer';
+
+const { getAllProducers } = useProducerStore()
+const { getAllProperties } = usePropertyStore()
+
+const producers = ref<Producer[]>([]);
+const properties = ref<Property[]>([]);
+const quantityPropertiesValue = ref<number>(0);
+const quantityProducersValue = ref<number>(0);
+
+onMounted(async () => {
+  producers.value = (await getAllProducers());
+  properties.value = (await getAllProperties());
+  quantityPropertiesValue.value = properties.value.length || 0;
+  quantityProducersValue.value = producers.value.length || 0;
+})
+
+</script>
+
 <style scoped>
 .dashboard {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 0;
 }
-
-/* .welcome-section {
-  text-align: center;
-  margin-bottom: 3rem;
-  padding: 2rem;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border-radius: 1rem;
-  border: 1px solid #bbf7d0;
-}
-
-.welcome-section h1 {
-  font-size: 2.5rem;
-  color: #065f46;
-  margin-bottom: 0.5rem;
-  font-weight: 700;
-}
-
-.welcome-section p {
-  font-size: 1.2rem;
-  color: #047857;
-  margin: 0;
-} */
 
 .stats-grid {
   display: grid;
@@ -274,14 +272,6 @@
 }
 
 @media (max-width: 768px) {
-  /* .welcome-section h1 {
-    font-size: 2rem;
-  }
-
-  .welcome-section p {
-    font-size: 1rem;
-  } */
-
   .stats-grid {
     grid-template-columns: 1fr;
   }

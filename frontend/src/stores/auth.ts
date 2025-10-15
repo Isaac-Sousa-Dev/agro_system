@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import Cookies from 'js-cookie'
 import api from '@/services/api'
-import type { User, LoginCredentials, LoginResponse } from '@/types/auth'
+import type { User, LoginCredentials } from '@/types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
       const { token: authToken, user: userData } = response.data
 
       // Store token in cookie
-      Cookies.set('token', authToken, { 
+      Cookies.set('token', authToken, {
         expires: 7, // 7 days
         secure: true,
         sameSite: 'strict'
@@ -48,8 +48,9 @@ export const useAuthStore = defineStore('auth', () => {
       api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`
 
       return { success: true }
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erro ao fazer login'
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { message?: string } } }
+      error.value = axiosError?.response?.data?.message || 'Erro ao fazer login'
       return { success: false, error: error.value }
     } finally {
       loading.value = false
@@ -84,6 +85,7 @@ export const useAuthStore = defineStore('auth', () => {
       return true
     } catch (err) {
       // Token is invalid, clear it
+      console.log(err)
       await logout()
       return false
     }
@@ -99,11 +101,11 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     loading,
     error,
-    
+
     // Getters
     isAuthenticated,
     userInitials,
-    
+
     // Actions
     login,
     logout,

@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import Sidebar from '@/components/Sidebar.vue'
+import Toast from 'primevue/toast'
 
 const { isAuthenticated } = useAuth()
 const sidebarOpen = ref(false)
@@ -62,6 +63,7 @@ onUnmounted(() => {
         'with-mobile-header': showSidebar && isMobile
       }"
     >
+      <Toast />
       <div v-if="showSidebar" class="container">
         <RouterView />
       </div>

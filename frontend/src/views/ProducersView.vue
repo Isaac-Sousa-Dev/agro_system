@@ -6,21 +6,24 @@
       <p class="text-gray-500">Gerencie os produtores rurais cadastrados</p>
     </div>
 
-    <div class="toolbar">
-      <div class="left">
+    <div class="flex justify-between items-center mb-4">
+      <div class="w-full">
         <button class="btn-primary" @click="openCreate">
           <span class="btn-icon"><i class="pi pi-plus"></i></span>
           Novo Produtor
         </button>
       </div>
-      <div class="right">
-        <InputText type="text" v-model="search" placeholder="Buscar por nome, CPF/CNPJ, e-mail..." />
+      <div class="w-full flex gap-2">
+        <InputGroup>
+            <InputText fluid type="text" v-model="search" placeholder="Buscar por nome, CPF/CNPJ, e-mail..." />
+            <InputGroupAddon>
+                <span class="pi pi-search"></span>
+            </InputGroupAddon>
+        </InputGroup>
         <button class="btn-secondary" @click="load">
           <i class="pi pi-refresh"></i>
         </button>
       </div>
-
-
     </div>
 
     <div class="table-card">
@@ -44,8 +47,8 @@
           </tr>
           <tr v-for="producer in filtered" :key="producer.id">
             <td>{{ producer.name }}</td>
-            <td>{{ producer.cpf_cnpj }}</td>
-            <td>{{ producer.phone || '-' }}</td>
+            <td v-mask="'cpf_cnpj'">{{ producer.cpf_cnpj }}</td>
+            <td v-mask="'phone'">{{ producer.phone || '-' }}</td>
             <td>{{ producer.email || '-' }}</td>
             <td>{{ producer.registration_date || '-' }}</td>
             <td>
@@ -58,225 +61,21 @@
           </tr>
         </tbody>
       </table>
+      <Paginator
+        :first="(store.currentPage - 1) * store.perPage"
+        :rows="store.perPage"
+        :totalRecords="store.total"
+        @page="onPage"
+      />
     </div>
 
-    <!-- Criar -->
-    <div v-if="showCreate" class="modal-backdrop">
-      <div class="modal">
-        <h3 class="text-black text-lg font-bold mb-2">Novo Produtor</h3>
-        <form @submit.prevent="submitCreate">
+    <ProducerCreateModal v-model="showCreate" :value="form" @save="handleCreate" />
 
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col gap-1">
-              <label>Nome</label>
-              <InputText type="text" v-model="form.name" placeholder="Digite o nome do produtor" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label>CPF/CNPJ</label>
-              <InputText type="text" v-model="form.cpf_cnpj" placeholder="000.000.000-00" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label>Telefone</label>
-              <InputText type="text" v-model="form.phone" placeholder="(00) 00000-0000" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label>E-mail</label>
-              <InputText type="email" v-model="form.email" placeholder="exemplo@email.com" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label>Endereço</label>
-              <InputText type="text" v-model="form.address" placeholder="Rua, número, bairro, cidade, estado" />
-            </div>
-          </div>
+    <ProducerEditModal v-model="showEdit" :value="form" @save="handleEdit" />
 
-          <div class="mt-4">
-            <Tabs value="0">
-              <TabList>
-                <Tab value="0">Propriedades</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel value="0">
-                  <div class="flex justify-end mb-2">
-                    <Button type="button" class="" @click="addPropertySection">
-                      <span class="btn-icon"><i class="pi pi-plus"></i></span>
-                      Adicionar propriedade
-                    </Button>
-                  </div>
+    <ProducerViewModal v-model="showView" :value="selected as Producer" />
 
-                  <div class="space-y-3">
-                    <div v-for="(prop, idx) in form.properties" :key="idx" class="accordion">
-                      <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="prop.open = !prop.open">
-                        <div class="title">
-                          <i class="pi" :class="prop.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                          <span class="ml-4">Propriedade {{ idx + 1 }} — {{ prop.name || 'Sem nome' }}</span>
-                        </div>
-                        <div class="actions">
-                          <Button label="Danger" severity="danger" @click.stop="removePropertySection(idx)">
-                            <i class="pi pi-trash"></i>
-                          </Button>
-                        </div>
-                      </div>
-                      <div v-show="prop.open" class="mt-3 p-2">
-                        <div class="grid grid-cols-2 gap-4">
-                          <div class="flex flex-col gap-1">
-                            <label>Nome</label>
-                            <InputText type="text" v-model="prop.name" placeholder="Ex.: Fazenda São João" />
-                          </div>
-                          <div class="flex flex-col gap-1">
-                            <label>Município</label>
-                            <InputText type="text" v-model="prop.municipality" placeholder="Ex.: Viçosa do Ceará" />
-                          </div>
-                          <div class="flex flex-col gap-1">
-                            <label>UF</label>
-                            <InputText type="text" v-model="prop.state" maxlength="2" placeholder="UF" />
-                          </div>
-                          <div class="flex flex-col gap-1">
-                            <label>Inscrição Estadual</label>
-                            <InputText type="text" v-model="prop.state_registration" placeholder="Opcional" />
-                          </div>
-                          <div class="flex flex-col gap-1">
-                            <label>Área Total (ha)</label>
-                            <InputText type="number" v-model.number="prop.total_area" placeholder="0.00" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          </div>
-          <div class="mt-4 flex justify-end gap-2">
-            <Button label="Secondary" severity="secondary" class="bg-gray-200" @click="showCreate = false">Cancelar</Button>
-            <Button class="px-10" type="submit">Salvar</Button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Editar -->
-    <div v-if="showEdit" class="modal-backdrop">
-      <div class="modal">
-        <h3 class="text-black text-lg font-bold mb-2">Editar Produtor</h3>
-
-        <form @submit.prevent="submitEdit">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col gap-1">
-              <label>Nome</label>
-              <InputText type="text" v-model="form.name" placeholder="Digite o nome do produtor" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label>CPF/CNPJ</label>
-              <InputText type="text" v-model="form.cpf_cnpj" placeholder="000.000.000-00" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label>Telefone</label>
-              <InputText type="text" v-model="form.phone" placeholder="(00) 00000-0000" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label>E-mail</label>
-              <InputText type="email" v-model="form.email" placeholder="exemplo@email.com" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label>Endereço</label>
-              <InputText type="text" v-model="form.address" placeholder="Rua, número, bairro, cidade, estado" />
-            </div>
-          </div>
-
-          <div class="mt-4">
-            <Tabs value="0">
-              <TabList>
-                <Tab value="0">Propriedades</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel value="0">
-                  <div class="flex justify-end mb-2">
-                    <Button type="button" class="" @click="addPropertySection">
-                      <span class="btn-icon"><i class="pi pi-plus"></i></span>
-                      Adicionar propriedade
-                    </Button>
-                  </div>
-
-                  <div class="space-y-3">
-                    <div v-for="(prop, idx) in form.properties" :key="idx" class="accordion">
-                      <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="prop.open = !prop.open">
-                        <div class="title">
-                          <i class="pi" :class="prop.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                          <span class="ml-4">Propriedade {{ idx + 1 }} — {{ prop.name || 'Sem nome' }}</span>
-                        </div>
-                        <div class="actions">
-                          <Button label="Danger" severity="danger" @click.stop="removePropertySection(idx)">
-                            <i class="pi pi-trash"></i>
-                          </Button>
-                        </div>
-                      </div>
-                      <div v-show="prop.open" class="mt-3 p-2">
-                        <div class="grid grid-cols-2 gap-4">
-                          <div class="flex flex-col gap-1">
-                            <label>Nome</label>
-                            <InputText type="text" v-model="prop.name" placeholder="Ex.: Fazenda São João" />
-                          </div>
-                          <div class="flex flex-col gap-1">
-                            <label>Município</label>
-                            <InputText type="text" v-model="prop.municipality" placeholder="Ex.: Viçosa do Ceará" />
-                          </div>
-                          <div class="flex flex-col gap-1">
-                            <label>UF</label>
-                            <InputText type="text" v-model="prop.state" maxlength="2" placeholder="UF" />
-                          </div>
-                          <div class="flex flex-col gap-1">
-                            <label>Inscrição Estadual</label>
-                            <InputText type="text" v-model="prop.state_registration" placeholder="Opcional" />
-                          </div>
-                          <div class="flex flex-col gap-1">
-                            <label>Área Total (ha)</label>
-                            <InputText type="number" v-model.number="prop.total_area" placeholder="0.00" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          </div>
-          <div class="mt-4 flex justify-end gap-2">
-            <Button label="Secondary" severity="secondary" class="bg-gray-200" @click="showEdit = false">Cancelar</Button>
-            <Button class="px-10" type="submit">Salvar Alterações</Button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div v-if="showView && selected" class="modal-backdrop">
-      <div class="modal">
-        <h3>Detalhes do Produtor</h3>
-        <div class="details">
-          <div><strong>Nome:</strong> {{ selected.name }}</div>
-          <div><strong>CPF/CNPJ:</strong> {{ selected.cpf_cnpj }}</div>
-          <div><strong>Telefone:</strong> {{ selected.phone || '-' }}</div>
-          <div><strong>E-mail:</strong> {{ selected.email || '-' }}</div>
-          <div><strong>Endereço:</strong> {{ selected.address || '-' }}</div>
-          <div><strong>Data de Cadastro:</strong> {{ selected.registration_date || '-' }}</div>
-          <div><strong>Criado em:</strong> {{ selected.created_at }}</div>
-          <div><strong>Atualizado em:</strong> {{ selected.updated_at }}</div>
-        </div>
-        <div class="modal-actions">
-          <Button class="btn-secondary" @click="showView = false">Fechar</Button>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="showConfirmDelete && selected" class="modal-backdrop">
-      <div class="modal">
-        <h3>Confirmar Exclusão</h3>
-        <p>Tem certeza que deseja excluir o produtor "{{ selected.name }}"?</p>
-        <div class="modal-actions">
-          <Button class="btn-secondary" @click="showConfirmDelete = false">Cancelar</Button>
-          <Button class="btn-danger" @click="confirmDelete">Excluir</Button>
-        </div>
-      </div>
-    </div>
+    <ProducerDeleteModal v-model="showConfirmDelete" :name="selected?.name || ''" @confirm="confirmDelete" />
 
   </div>
 
@@ -284,31 +83,33 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref, computed } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import { useProducerStore } from '@/stores/producer'
 import type { Producer } from '@/types/producer'
 import InputText from 'primevue/inputtext';
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
-import TabPanels from 'primevue/tabpanels';
-import TabPanel from 'primevue/tabpanel';
-import Button from 'primevue/button';
+import Paginator from 'primevue/paginator'
 import type { Property } from '@/types/property';
+import ProducerCreateModal from '@/components/modals/ProducerCreateModal.vue'
+import ProducerEditModal from '@/components/modals/ProducerEditModal.vue'
+import ProducerViewModal from '@/components/modals/ProducerViewModal.vue'
+import ProducerDeleteModal from '@/components/modals/ProducerDeleteModal.vue'
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
 
 const store = useProducerStore()
+const toast = useToast()
 const search = ref('')
 const showCreate = ref(false)
 const showEdit = ref(false)
 const showView = ref(false)
 const showConfirmDelete = ref(false)
 
-// Tipos auxiliares para o formulário de propriedades
 interface PropertyForm {
   name: string
   municipality: string
   state: string
   state_registration?: string | null
-  total_area: string // string no form, convertida no submit
+  total_area: string,
   open?: boolean,
   farmer_id?: number | null
 }
@@ -345,6 +146,11 @@ const filtered = computed(() => {
   )
 })
 
+async function onPage(event: { first: number; rows: number; page: number }) {
+  const nextPage = (event.page ?? 0) + 1
+  await store.list(nextPage, event.rows)
+}
+
 function resetForm() {
   form.name = ''
   form.cpf_cnpj = ''
@@ -356,7 +162,12 @@ function resetForm() {
 }
 
 async function load() {
-  await store.list()
+  try {
+    await store.list()
+    toast.add({ severity: 'success', summary: 'Produtores', detail: 'Lista atualizada', life: 2000 })
+  } catch {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar produtores', life: 3000 })
+  }
 }
 
 function openCreate() {
@@ -411,39 +222,50 @@ async function submitCreate() {
   }
 
   const payloadForApi = payload as unknown as Omit<Producer, 'id' | 'created_at' | 'updated_at'>
-  await store.create(payloadForApi)
-  showCreate.value = false
-  resetForm()
+  try {
+    await store.create(payloadForApi)
+    toast.add({ severity: 'success', summary: 'Produtor', detail: 'Criado com sucesso', life: 2500 })
+    showCreate.value = false
+    resetForm()
+  } catch {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar produtor', life: 3000 })
+  }
+}
+
+function handleCreate(value: ProducerForm) {
+  Object.assign(form, value)
+  void submitCreate()
 }
 
 async function submitEdit() {
   if (!selected.value) return
-  await store.update(selected.value.id, { ...form })
-  showEdit.value = false
+  try {
+    await store.update(selected.value.id, { ...form })
+    toast.add({ severity: 'success', summary: 'Produtor', detail: 'Atualizado com sucesso', life: 2500 })
+    showEdit.value = false
+  } catch {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar produtor', life: 3000 })
+  }
+}
+
+function handleEdit(value: ProducerForm) {
+  Object.assign(form, value)
+  void submitEdit()
 }
 
 async function confirmDelete() {
   if (!selected.value) return
-  await store.remove(selected.value.id)
-  showConfirmDelete.value = false
+  try {
+    await store.remove(selected.value.id)
+    toast.add({ severity: 'success', summary: 'Produtor', detail: 'Excluído com sucesso', life: 2500 })
+    showConfirmDelete.value = false
+    load()
+  } catch {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir produtor', life: 3000 })
+  }
 }
 
 onMounted(load)
-
-function addPropertySection() {
-  form.properties.push({
-    name: '',
-    municipality: '',
-    state: '',
-    state_registration: '',
-    total_area: '',
-    open: true,
-  })
-}
-
-function removePropertySection(index: number) {
-  form.properties.splice(index, 1)
-}
 </script>
 
 <style scoped>
@@ -510,6 +332,22 @@ function removePropertySection(index: number) {
   border-radius: 0.5rem;
   overflow: hidden;
 }
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+.page-btn {
+  background: #f3f4f6; border: 1px solid #d1d5db; color: #374151;
+  padding: 0.4rem 0.6rem; border-radius: 0.375rem; cursor: pointer;
+}
+.page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.page-info { color: #6b7280; font-size: 0.9rem; }
 
 .table { width: 100%; border-collapse: collapse; }
 .table thead { background: #f9fafb; }

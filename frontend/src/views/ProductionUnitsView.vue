@@ -144,10 +144,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref, reactive, computed } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import { useProductionUnitStore } from '@/stores/productionUnit'
 import type { ProductionUnit } from '@/types/productionUnit'
 
 const store = useProductionUnitStore()
+const toast = useToast()
 const search = ref('')
 const showCreate = ref(false)
 const showEdit = ref(false)
@@ -178,7 +180,14 @@ function resetForm() {
   form.coordenadas_geograficas = ''
 }
 
-async function load() { await store.list() }
+async function load() {
+  try {
+    await store.list()
+    toast.add({ severity: 'success', summary: 'Unidades', detail: 'Lista atualizada', life: 2000 })
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar unidades', life: 3000 })
+  }
+}
 function openCreate() { resetForm(); showCreate.value = true }
 function openView(item: ProductionUnit) { selected.value = item; showView.value = true }
 function openEdit(item: ProductionUnit) {
@@ -191,9 +200,36 @@ function openEdit(item: ProductionUnit) {
 }
 function openDelete(item: ProductionUnit) { selected.value = item; showConfirmDelete.value = true }
 
-async function submitCreate() { await store.create({ ...form }); showCreate.value = false; resetForm() }
-async function submitEdit() { if (!selected.value) return; await store.update(selected.value.id, { ...form }); showEdit.value = false }
-async function confirmDelete() { if (!selected.value) return; await store.remove(selected.value.id); showConfirmDelete.value = false }
+async function submitCreate() {
+  try {
+    await store.create({ ...form })
+    toast.add({ severity: 'success', summary: 'Unidade', detail: 'Criada com sucesso', life: 2500 })
+    showCreate.value = false
+    resetForm()
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar unidade', life: 3000 })
+  }
+}
+async function submitEdit() {
+  if (!selected.value) return
+  try {
+    await store.update(selected.value.id, { ...form })
+    toast.add({ severity: 'success', summary: 'Unidade', detail: 'Atualizada com sucesso', life: 2500 })
+    showEdit.value = false
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar unidade', life: 3000 })
+  }
+}
+async function confirmDelete() {
+  if (!selected.value) return
+  try {
+    await store.remove(selected.value.id)
+    toast.add({ severity: 'success', summary: 'Unidade', detail: 'Excluída com sucesso', life: 2500 })
+    showConfirmDelete.value = false
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir unidade', life: 3000 })
+  }
+}
 
 onMounted(load)
 </script>

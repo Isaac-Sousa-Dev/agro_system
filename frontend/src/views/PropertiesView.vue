@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, computed } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import { usePropertyStore } from '@/stores/property'
 import type { Property } from '@/types/property'
 
 const store = usePropertyStore()
+const toast = useToast()
 const search = ref('')
 const showCreate = ref(false)
 const showEdit = ref(false)
@@ -41,7 +43,13 @@ function resetForm() {
 }
 
 async function load() {
-  await store.list()
+  try {
+    await store.list()
+    toast.add({ severity: 'success', summary: 'Propriedades', detail: 'Lista atualizada', life: 2000 })
+  } catch (e) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar propriedades', life: 3000 })
+  }
 }
 
 function openCreate() {
@@ -71,21 +79,39 @@ function openDelete(item: Property) {
 }
 
 async function submitCreate() {
-  await store.create({ ...form })
-  showCreate.value = false
-  resetForm()
+  try {
+    await store.create({ ...form })
+    toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Criada com sucesso', life: 2500 })
+    showCreate.value = false
+    resetForm()
+  } catch (e) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar propriedade', life: 3000 })
+  }
 }
 
 async function submitEdit() {
   if (!selected.value) return
-  await store.update(selected.value.id, { ...form })
-  showEdit.value = false
+  try {
+    await store.update(selected.value.id, { ...form })
+    toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Atualizada com sucesso', life: 2500 })
+    showEdit.value = false
+  } catch (e) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar propriedade', life: 3000 })
+  }
 }
 
 async function confirmDelete() {
   if (!selected.value) return
-  await store.remove(selected.value.id)
-  showConfirmDelete.value = false
+  try {
+    await store.remove(selected.value.id)
+    toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Excluída com sucesso', life: 2500 })
+    showConfirmDelete.value = false
+  } catch (e) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir propriedade', life: 3000 })
+  }
 }
 
 onMounted(load)

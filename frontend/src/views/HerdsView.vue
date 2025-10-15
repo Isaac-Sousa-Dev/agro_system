@@ -155,10 +155,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref, reactive, computed } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import { useHerdStore } from '@/stores/herd'
 import type { Herd } from '@/types/herd'
 
 const store = useHerdStore()
+const toast = useToast()
 const search = ref('')
 const showCreate = ref(false)
 const showEdit = ref(false)
@@ -191,7 +193,14 @@ function resetForm() {
   form.data_atualizacao = ''
 }
 
-async function load() { await store.list() }
+async function load() {
+  try {
+    await store.list()
+    toast.add({ severity: 'success', summary: 'Rebanhos', detail: 'Lista atualizada', life: 2000 })
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar rebanhos', life: 3000 })
+  }
+}
 function openCreate() { resetForm(); showCreate.value = true }
 function openView(item: Herd) { selected.value = item; showView.value = true }
 function openEdit(item: Herd) {
@@ -205,9 +214,36 @@ function openEdit(item: Herd) {
 }
 function openDelete(item: Herd) { selected.value = item; showConfirmDelete.value = true }
 
-async function submitCreate() { await store.create({ ...form }); showCreate.value = false; resetForm() }
-async function submitEdit() { if (!selected.value) return; await store.update(selected.value.id, { ...form }); showEdit.value = false }
-async function confirmDelete() { if (!selected.value) return; await store.remove(selected.value.id); showConfirmDelete.value = false }
+async function submitCreate() {
+  try {
+    await store.create({ ...form })
+    toast.add({ severity: 'success', summary: 'Rebanho', detail: 'Criado com sucesso', life: 2500 })
+    showCreate.value = false
+    resetForm()
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar rebanho', life: 3000 })
+  }
+}
+async function submitEdit() {
+  if (!selected.value) return
+  try {
+    await store.update(selected.value.id, { ...form })
+    toast.add({ severity: 'success', summary: 'Rebanho', detail: 'Atualizado com sucesso', life: 2500 })
+    showEdit.value = false
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar rebanho', life: 3000 })
+  }
+}
+async function confirmDelete() {
+  if (!selected.value) return
+  try {
+    await store.remove(selected.value.id)
+    toast.add({ severity: 'success', summary: 'Rebanho', detail: 'Excluído com sucesso', life: 2500 })
+    showConfirmDelete.value = false
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir rebanho', life: 3000 })
+  }
+}
 
 onMounted(load)
 </script>

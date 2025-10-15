@@ -2,55 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FarmerRequest;
 use Illuminate\Http\Request;
 use App\Models\Farmer;
+use App\Services\FarmerService;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 
 class FarmerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    private $farmerService;
+
+    public function __construct(FarmerService $farmerService)
+    {
+        $this->farmerService = $farmerService;
+    }
+
     public function index(Request $request): JsonResponse
     {
         $query = Farmer::with('properties');
 
-        // Search by name or CPF/CNPJ
-        if ($request->has('search')) {
-            $search = $request->get('search');
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'ilike', "%{$search}%")
-                  ->orWhere('cpf_cnpj', 'ilike', "%{$search}%");
-            });
-        }
+        // if ($request->has('search')) {
+        //     $search = $request->get('search');
+        //     $query->where(function($query) use ($search) {
+        //         $query->where('name', 'ilike', "%{$search}%")
+        //           ->orWhere('cpf_cnpj', 'ilike', "%{$search}%");
+        //     });
+        // }
 
-        // Filter by municipality
-        if ($request->has('municipality')) {
-            $query->whereHas('properties', function($q) use ($request) {
-                $q->where('municipality', $request->get('municipality'));
-            });
-        }
-
-        $farmers = $query->paginate(15);
-
+        $farmers = $query->orderBy('id', 'desc')->paginate(6);
         return response()->json($farmers);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): JsonResponse
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'cpf_cnpj' => 'required|string|unique:farmers,cpf_cnpj',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-            'registration_date' => 'required|date',
-        ]);
 
-        $farmer = Farmer::create($request->all());
+    public function store(FarmerRequest $request): JsonResponse
+    {
+        try {
+            $properties = $request->properties;
+            $farmer = $this->farmerService->create($request->all(), $properties);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Farmer not created',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
         return response()->json([
             'message' => 'Farmer created successfully',
@@ -58,9 +54,7 @@ class FarmerController extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Farmer $farmer): JsonResponse
     {
         return response()->json([
@@ -68,21 +62,19 @@ class FarmerController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Farmer $farmer): JsonResponse
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'cpf_cnpj' => 'required|string|unique:farmers,cpf_cnpj,' . $farmer->id,
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-            'registration_date' => 'required|date',
-        ]);
 
-        $farmer->update($request->all());
+    public function update(FormRequest $request, Farmer $farmer): JsonResponse
+    {
+
+        try {
+            $properties = $request->properties;
+            $farmer = $this->farmerService->update($request->all(), $farmer->id, $properties);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Farmer not updated',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
         return response()->json([
             'message' => 'Farmer updated successfully',
@@ -90,9 +82,7 @@ class FarmerController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Farmer $farmer): JsonResponse
     {
         $farmer->delete();

@@ -16,11 +16,6 @@ class Farmer extends Model
         'phone',
         'email',
         'address',
-        'registration_date',
-    ];
-
-    protected $casts = [
-        'registration_date' => 'date',
     ];
 
     public function properties(): HasMany

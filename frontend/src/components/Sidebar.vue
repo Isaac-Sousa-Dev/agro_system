@@ -1,11 +1,7 @@
 <template>
   <aside class="sidebar" :class="{ 'sidebar-collapsed': collapsed }">
-    <!-- Header da Sidebar -->
     <div class="sidebar-header">
       <div class="logo-section">
-        <!-- <div class="logo-icon">
-          <i class="pi pi-seedling"></i>
-        </div> -->
         <div v-if="!collapsed" class="logo-text">
           <h2>Agro System</h2>
           <p>Sistema de Gestão</p>
@@ -14,7 +10,6 @@
 
     </div>
 
-    <!-- Seção de Perfil do Usuário -->
     <div class="profile-section">
       <div class="profile-info">
         <div class="profile-avatar">
@@ -39,7 +34,6 @@
       </button>
     </div>
 
-    <!-- Menu de Navegação -->
     <nav class="sidebar-nav">
       <ul class="nav-list">
         <li class="nav-item">
@@ -56,7 +50,7 @@
             <span class="nav-icon">
               <i class="pi pi-users"></i>
             </span>
-            <span v-if="!collapsed" class="nav-text">Produtor Rural</span>
+            <span v-if="!collapsed" class="nav-text">Produtores</span>
           </router-link>
         </li>
 
@@ -65,7 +59,7 @@
             <span class="nav-icon">
               <i class="pi pi-home"></i>
             </span>
-            <span v-if="!collapsed" class="nav-text">Propriedade</span>
+            <span v-if="!collapsed" class="nav-text">Propriedades</span>
           </router-link>
         </li>
 
@@ -74,7 +68,7 @@
             <span class="nav-icon">
               <i class="pi pi-sort-amount-up"></i>
             </span>
-            <span v-if="!collapsed" class="nav-text">Unidade de Produção</span>
+            <span v-if="!collapsed" class="nav-text">Unidades de Produção</span>
           </router-link>
         </li>
 
@@ -83,7 +77,7 @@
             <span class="nav-icon">
               <i class="pi pi-circle"></i>
             </span>
-            <span v-if="!collapsed" class="nav-text">Rebanho</span>
+            <span v-if="!collapsed" class="nav-text">Rebanhos</span>
           </router-link>
         </li>
 
@@ -98,7 +92,6 @@
       </ul>
     </nav>
 
-    <!-- Footer da Sidebar -->
     <div v-if="!collapsed" class="sidebar-footer">
       <p class="footer-text">© 2024 Agro System</p>
       <p class="footer-version">v1.0.0</p>
@@ -162,7 +155,6 @@ watch(() => props.isOpen, (newValue) => {
 // Event listeners
 onMounted(() => {
   checkIsMobile()
-  console.log(user.value, 'user on mount')
   window.addEventListener('resize', checkIsMobile)
 })
 

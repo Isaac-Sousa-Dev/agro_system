@@ -261,8 +261,8 @@ onMounted(load)
           <div><strong>UF:</strong> {{ selected.state }}</div>
           <div><strong>Inscrição Estadual:</strong> {{ selected.state_registration || '-' }}</div>
           <div><strong>Área Total (ha):</strong> {{ selected.total_area }}</div>
-          <div><strong>Criado em:</strong> {{ selected.created_at }}</div>
-          <div><strong>Atualizado em:</strong> {{ selected.updated_at }}</div>
+          <div><strong>Criado em:</strong> <span v-mask="'datetime'">{{ selected.created_at }}</span></div>
+          <div><strong>Atualizado em:</strong> <span v-mask="'datetime'">{{ selected.updated_at }}</span></div>
         </div>
         <div class="modal-actions">
           <button class="btn-secondary" @click="showView = false">Fechar</button>

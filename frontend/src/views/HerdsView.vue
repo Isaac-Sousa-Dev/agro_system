@@ -41,7 +41,7 @@
             <td>{{ h.especie }}</td>
             <td>{{ h.quantidade }}</td>
             <td>{{ h.finalidade || '-' }}</td>
-            <td>{{ h.data_atualizacao || '-' }}</td>
+            <td v-mask="'date'">{{ h.data_atualizacao || '-' }}</td>
             <td>
               <div class="row-actions">
                 <button class="icon" @click="openView(h)" title="Ver"><i class="pi pi-eye"></i></button>
@@ -129,9 +129,9 @@
           <div><strong>Espécie:</strong> {{ selected.especie }}</div>
           <div><strong>Quantidade:</strong> {{ selected.quantidade }}</div>
           <div><strong>Finalidade:</strong> {{ selected.finalidade || '-' }}</div>
-          <div><strong>Data de Atualização:</strong> {{ selected.data_atualizacao || '-' }}</div>
-          <div><strong>Criado em:</strong> {{ selected.created_at }}</div>
-          <div><strong>Atualizado em:</strong> {{ selected.updated_at }}</div>
+          <div><strong>Data de Atualização:</strong> <span v-mask="'date'">{{ selected.data_atualizacao || '-' }}</span></div>
+          <div><strong>Criado em:</strong> <span v-mask="'datetime'">{{ selected.created_at }}</span></div>
+          <div><strong>Atualizado em:</strong> <span v-mask="'datetime'">{{ selected.updated_at }}</span></div>
         </div>
         <div class="modal-actions">
           <button class="btn-secondary" @click="showView = false">Fechar</button>

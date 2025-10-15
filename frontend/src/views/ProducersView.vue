@@ -50,7 +50,7 @@
             <td v-mask="'cpf_cnpj'">{{ producer.cpf_cnpj }}</td>
             <td v-mask="'phone'">{{ producer.phone || '-' }}</td>
             <td>{{ producer.email || '-' }}</td>
-            <td>{{ producer.registration_date || '-' }}</td>
+            <td v-mask="'date'">{{ producer.registration_date || '-' }}</td>
             <td>
               <div class="row-actions">
                 <button class="icon" title="Ver" @click="openView(producer)"><i class="pi pi-eye"></i></button>

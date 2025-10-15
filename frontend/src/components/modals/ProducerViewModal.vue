@@ -24,11 +24,11 @@
           <span>{{ value.address || '-' }}</span>
         </div>
         <div class="flex flex-col"><strong>Criado em:</strong>
-          {{ value.created_at }}
+          <span v-mask="'datetime'">{{ value.created_at }}</span>
         </div>
         <div class="flex flex-col">
           <strong>Atualizado em:</strong>
-          {{ value.updated_at }}
+          <span v-mask="'datetime'">{{ value.updated_at }}</span>
         </div>
       </div>
       <div class="modal-actions">

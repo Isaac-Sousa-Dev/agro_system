@@ -84,7 +84,6 @@ class FarmerController extends Controller
 
     public function destroy(Farmer $farmer): JsonResponse
     {
-
         try {
             $farmer = $this->farmerService->delete($farmer->id);
         } catch (\Exception $e) {

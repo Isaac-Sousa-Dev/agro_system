@@ -99,21 +99,25 @@ class PropertyController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Property $property): JsonResponse
     {
-        $property->delete();
+        try {
+            $property = $this->propertyService->delete($property->id);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Property not deleted',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
         return response()->json([
             'message' => 'Property deleted successfully'
         ]);
+
     }
 
-    /**
-     * Export properties to Excel
-     */
+
     public function export(Request $request): JsonResponse
     {
         // This will be implemented later with Excel export

@@ -19,7 +19,6 @@ class HerdFactory extends Factory
             'species' => $this->faker->randomElement(['Bovino', 'Caprino', 'Ovino', 'Suíno', 'Aves']),
             'quantity' => $this->faker->numberBetween(5, 500),
             'purpose' => $this->faker->randomElement(['Leite', 'Corte', 'Reprodução', 'Ovos']),
-            'update_date' => $this->faker->dateTimeBetween('-1 year')->format('Y-m-d'),
             'property_id' => Property::factory(),
         ];
     }

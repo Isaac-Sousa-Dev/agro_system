@@ -68,7 +68,7 @@
       />
     </div>
 
-    <PropertyCreateModal v-model="showCreate" :value="form" @save="handleCreate" />
+    <PropertyCreateModal ref="createModalRef" v-model="showCreate" :value="form" @save="handleCreate" />
 
     <PropertyEditModal v-model="showEdit" :value="form" @save="handleEdit" />
 
@@ -96,6 +96,7 @@ const store = usePropertyStore()
 const toast = useToast()
 const search = ref('')
 const showCreate = ref(false)
+const createModalRef = ref()
 
 const showEdit = ref(false)
 const showView = ref(false)
@@ -138,6 +139,7 @@ function resetForm() {
   form.total_area = ''
   form.productionUnits = []
   form.herds = []
+  form.farmer_id = null
 }
 
 async function load() {
@@ -153,6 +155,8 @@ async function load() {
 function openCreate() {
   resetForm()
   showCreate.value = true
+  // Limpar erros de validação quando abrir o modal
+  createModalRef.value?.clearAllErrors()
 }
 
 function openView(item: Property) {
@@ -163,6 +167,7 @@ function openView(item: Property) {
 function openEdit(item: Property) {
   selected.value = item
   form.name = item.name
+  form.farmer_id = item.farmer_id
   form.municipality = item.municipality
   form.state = item.state
   form.state_registration = item.state_registration ?? ''
@@ -183,8 +188,19 @@ async function submitCreate() {
     toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Criada com sucesso', life: 2500 })
     showCreate.value = false
     resetForm()
-  } catch (e) {
+  } catch (e: unknown) {
     console.error(e)
+
+    // Verificar se há erros de validação
+    if (e && typeof e === 'object' && 'response' in e) {
+      const error = e as { response?: { data?: { errors?: Record<string, string[]> } } }
+      if (error.response?.data?.errors) {
+        // Definir erros de validação no modal
+        createModalRef.value?.setValidationErrors(error.response.data.errors)
+        toast.add({ severity: 'error', summary: 'Erro', detail: 'Verifique os campos obrigatórios', life: 3000 })
+        return
+      }
+    }
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar propriedade', life: 3000 })
   }
 }
@@ -201,6 +217,7 @@ async function submitEdit() {
     await store.update(selected.value.id, { ...form })
     toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Atualizada com sucesso', life: 2500 })
     showEdit.value = false
+    load()
   } catch (e) {
     console.error(e)
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar propriedade', life: 3000 })

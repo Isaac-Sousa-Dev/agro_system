@@ -27,7 +27,7 @@ class PropertyRequest extends FormRequest
             'state' => 'required|string|max:2',
             'state_registration' => 'nullable|string|max:255',
             'total_area' => 'required|numeric|min:0',
-            'farmer_id' => 'required|exists:farmers,id',
+            'farmer_id' => 'required',
         ];
     }
 
@@ -35,8 +35,11 @@ class PropertyRequest extends FormRequest
     {
         return [
             'name.required' => 'O nome é obrigatório',
-            'municipality.required' => 'A cidade é obrigatória',
-            'state.required' => 'O estado é obrigatório',
+            'municipality.required' => 'O município é obrigatório',
+            'state.required' => 'A UF é obrigatória',
+            'state_registration.required' => 'O registro estadual é obrigatório',
+            'total_area.required' => 'A área total é obrigatória',
+            'farmer_id.required' => 'O produtor é obrigatório',
         ];
     }
 }

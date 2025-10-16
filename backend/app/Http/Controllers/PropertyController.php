@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PropertyRequest;
+use App\Http\Resources\PropertyResource;
 use Illuminate\Http\Request;
 use App\Models\Property;
 use Illuminate\Http\JsonResponse;
@@ -50,14 +51,16 @@ class PropertyController extends Controller
 
         $properties = $query->orderBy('id', 'desc')->paginate(6);
 
-        return response()->json($properties);
+        return PropertyResource::collection($properties)
+        ->response()
+        ->setStatusCode(200);
     }
 
 
     public function store(PropertyRequest $request): JsonResponse
     {
         try {
-            $property = $this->propertyService->create($request->all());
+            $property = $this->propertyService->create($request->all(), $request->productionUnits, $request->herds);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Property not created',
@@ -71,9 +74,7 @@ class PropertyController extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Property $property): JsonResponse
     {
         return response()->json([
@@ -81,26 +82,21 @@ class PropertyController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Property $property): JsonResponse
+
+    public function update(PropertyRequest $request, Property $property): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'municipality' => 'required|string|max:255',
-            'state' => 'required|string|max:2',
-            'state_registration' => 'nullable|string|max:255',
-            'total_area' => 'required|numeric|min:0',
-            'farmer_id' => 'required|exists:farmers,id',
-        ]);
+        try {
+            $updatedProperty = $this->propertyService->update($request->all(), $property->id, $request->productionUnits, $request->herds);
 
-        $property->update($request->all());
-
-        return response()->json([
-            'message' => 'Property updated successfully',
-            'data' => $property->load(['farmer', 'productionUnits', 'herds'])
-        ]);
+            return (new PropertyResource($updatedProperty))
+                ->response()
+                ->setStatusCode(200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Property not updated',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

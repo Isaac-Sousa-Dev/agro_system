@@ -5,28 +5,66 @@
       <form @submit.prevent="submit">
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
-            <label>Nome da propriedade</label>
-            <InputText type="text" v-model="local.name" placeholder="Ex.: Fazenda São João" />
+            <label>Nome da propriedade*</label>
+            <InputText
+              type="text"
+              v-model="local.name"
+              :invalid="!!getFieldError('name')"
+              placeholder="Ex.: Fazenda São João"
+              @input="clearFieldError('name')"
+            />
+            <small v-if="getFieldError('name')" class="text-red-500 text-xs">{{ getFieldError('name') }}</small>
           </div>
           <div class="flex flex-col gap-1">
-            <label>Município</label>
-            <InputText type="text" v-model="local.municipality" placeholder="Ex.: Viçosa do Ceará" />
+            <label>Município*</label>
+            <InputText
+              type="text"
+              v-model="local.municipality"
+              :invalid="!!getFieldError('municipality')"
+              placeholder="Ex.: Viçosa do Ceará"
+              @input="clearFieldError('municipality')"
+            />
+            <small v-if="getFieldError('municipality')" class="text-red-500 text-xs">{{ getFieldError('municipality') }}</small>
           </div>
           <div class="flex flex-col gap-1">
-            <label>UF</label>
-            <InputText type="text" v-model="local.state" v-mask="'state'" placeholder="Ex.: CE" />
+            <label>UF*</label>
+            <InputText
+              type="text"
+              v-model="local.state"
+              v-mask="'state'"
+              :invalid="!!getFieldError('state')"
+              placeholder="Ex.: CE"
+              @input="clearFieldError('state')"
+            />
+            <small v-if="getFieldError('state')" class="text-red-500 text-xs">{{ getFieldError('state') }}</small>
           </div>
           <div class="flex flex-col gap-1">
             <label>Inscrição Estadual</label>
             <InputText type="text" v-model="local.state_registration" v-mask="'state_registration'" placeholder="Opcional" />
           </div>
           <div class="flex flex-col gap-1">
-            <label>Área Total (ha)</label>
-            <InputText type="text" v-model="local.total_area" placeholder="00000" />
+            <label>Área Total (ha)*</label>
+            <InputText
+              type="text"
+              v-model="local.total_area"
+              :invalid="!!getFieldError('total_area')"
+              placeholder="00000"
+              @input="clearFieldError('total_area')"
+            />
+            <small v-if="getFieldError('total_area')" class="text-red-500 text-xs">{{ getFieldError('total_area') }}</small>
           </div>
           <div class="flex flex-col gap-1">
-            <label>Produtor</label>
-            <Select :options="producers" optionLabel="name" placeholder="Selecione um produtor" optionValue="id" v-model="local.farmer_id" />
+            <label>Produtor*</label>
+            <Select
+              :options="producers"
+              optionLabel="name"
+              placeholder="Selecione um produtor"
+              optionValue="id"
+              v-model="local.farmer_id"
+              :invalid="!!getFieldError('farmer_id')"
+              @change="clearFieldError('farmer_id')"
+            />
+            <small v-if="getFieldError('farmer_id')" class="text-red-500 text-xs">{{ getFieldError('farmer_id') }}</small>
           </div>
         </div>
 
@@ -144,6 +182,10 @@ import type { PropertyForm } from '@/types/property'
 import { useProducerStore } from '@/stores/producer'
 import type { Producer } from '@/types/producer'
 
+interface ValidationErrors {
+  [key: string]: string[]
+}
+
 const producerStore = useProducerStore()
 
 const props = defineProps<{
@@ -154,16 +196,51 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', v: boolean): void
   (e: 'save', v: PropertyForm): void
+  (e: 'validation-error', v: ValidationErrors): void
 }>()
 
+// Estado para armazenar erros de validação
+const validationErrors = ref<ValidationErrors>({})
+
 function close() {
+  validationErrors.value = {}
   emit('update:modelValue', false)
 }
 
+// Função para processar erros da API
+function setValidationErrors(errors: ValidationErrors) {
+  validationErrors.value = errors
+  emit('validation-error', errors)
+}
+
+// Função para limpar erros de um campo específico
+function clearFieldError(fieldName: string) {
+  if (validationErrors.value[fieldName]) {
+    delete validationErrors.value[fieldName]
+  }
+}
+
+// Função para obter erro de um campo
+function getFieldError(fieldName: string): string | undefined {
+  return validationErrors.value[fieldName]?.[0]
+}
+
+
+// Função para limpar todos os erros
+function clearAllErrors() {
+  validationErrors.value = {}
+}
 
 function submit() {
   emit('save', local.value)
 }
+
+// Expor funções para uso externo
+defineExpose({
+  setValidationErrors,
+  clearAllErrors,
+  validationErrors
+})
 
 
 function addProductionUnit() {

@@ -5,54 +5,64 @@
     @click.self="close"
   >
     <div class="modal">
-      <h3 class="text-black text-lg font-bold mb-2">Editar Produtor</h3>
+      <h3 class="text-black text-lg font-bold mb-2">Editar Propriedade</h3>
       <form @submit.prevent="submit">
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
             <label>Nome</label>
-            <InputText type="text" v-model="local.name" placeholder="Digite o nome do produtor" />
+            <InputText type="text" v-model="local.name" placeholder="Ex.: Fazenda São João"  />
           </div>
           <div class="flex flex-col gap-1">
-            <label>CPF/CNPJ</label>
-            <InputText type="text" v-model="local.cpf_cnpj" v-mask="'cpf_cnpj'" placeholder="000.000.000-00" />
+            <label>Município</label>
+            <InputText type="text" v-model="local.municipality" placeholder="Ex.: Viçosa do Ceará" />
           </div>
           <div class="flex flex-col gap-1">
-            <label>Telefone</label>
-            <InputText type="text" v-model="local.phone" v-mask="'phone'" placeholder="(00) 00000-0000" />
+            <label>UF</label>
+            <InputText v-model="local.state" placeholder="Ex.: CE" />
           </div>
           <div class="flex flex-col gap-1">
-            <label>E-mail</label>
-            <InputText type="email" v-model="local.email" placeholder="exemplo@email.com" />
+            <label>Área Total (ha)</label>
+            <InputText type="text" v-model="local.total_area" placeholder="00000" />
           </div>
           <div class="flex flex-col gap-1">
-            <label>Endereço</label>
-            <InputText type="text" v-model="local.address" placeholder="Rua, número, bairro, cidade, estado" />
+            <label>Inscrição Estadual</label>
+            <InputText type="text" v-model="local.state_registration" placeholder="Opcional" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label>Produtor</label>
+            <Select
+              :options="producers"
+              optionLabel="name"
+              placeholder="Selecione um produtor"
+              optionValue="id"
+              v-model="local.farmer_id" />
           </div>
         </div>
 
         <div class="mt-4">
           <Tabs value="0">
             <TabList>
-              <Tab value="0">Propriedades</Tab>
+              <Tab value="0">Unidades de Produção</Tab>
+              <Tab value="1">Rebanhos</Tab>
             </TabList>
             <TabPanels>
               <TabPanel value="0">
                 <div class="flex justify-end mb-2">
-                  <Button type="button" class="" @click="addProperty">
+                  <Button type="button" class="" @click="addProductionUnit">
                     <span class="btn-icon"><i class="pi pi-plus"></i></span>
-                    Adicionar propriedade
+                    Adicionar Unidade de Produção
                   </Button>
                 </div>
 
                 <div class="space-y-3">
-                  <div v-for="(prop, idx) in local.properties" :key="idx" class="accordion">
-                    <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleProperty(idx)">
+                  <div v-for="(prop, idx) in local.productionUnits" :key="idx" class="accordion">
+                    <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleProductionUnit(idx)">
                       <div class="title">
                         <i class="pi" :class="prop.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                        <span class="ml-4">Propriedade {{ idx + 1 }} — {{ prop.name || 'Sem nome' }}</span>
+                        <span class="ml-4">Unidade de Produção {{ idx + 1 }} — {{ prop.crop_name || 'Sem nome' }}</span>
                       </div>
                       <div class="actions">
-                        <Button label="Danger" severity="danger" @click.stop="removeProperty(idx)">
+                        <Button label="Danger" severity="danger" @click.stop="removeProductionUnit(idx)">
                           <i class="pi pi-trash"></i>
                         </Button>
                       </div>
@@ -60,24 +70,57 @@
                     <div v-show="prop.open" class="mt-3 p-2">
                       <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col gap-1">
-                          <label>Nome</label>
-                          <InputText type="text" v-model="prop.name" placeholder="Ex.: Fazenda São João" />
-                        </div>
-                        <div class="flex flex-col gap-1">
-                          <label>Município</label>
-                          <InputText type="text" v-model="prop.municipality" placeholder="Ex.: Viçosa do Ceará" />
-                        </div>
-                        <div class="flex flex-col gap-1">
-                          <label>UF</label>
-                          <InputText type="text" v-model="prop.state" v-mask="'state'" maxlength="2" placeholder="UF" />
-                        </div>
-                        <div class="flex flex-col gap-1">
-                          <label>Inscrição Estadual</label>
-                          <InputText type="text" v-model="prop.state_registration" v-mask="'state_registration'" placeholder="Opcional" />
+                          <label>Nome da cultura</label>
+                          <InputText type="text" v-model="prop.crop_name" placeholder="Ex.: Soja" />
                         </div>
                         <div class="flex flex-col gap-1">
                           <label>Área Total (ha)</label>
-                          <InputText type="text" v-model="prop.total_area" placeholder="00000" />
+                          <InputText type="text" v-model="prop.total_area_ha" placeholder="00000" />
+                        </div>
+                        <div class="flex flex-col gap-1">
+                          <label>Coordenadas Geográficas</label>
+                          <InputText type="text" v-model="prop.geographic_coordinates" placeholder="Ex.: -20.5482404,-42.8711134" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabPanel>
+
+              <TabPanel value="1">
+                <div class="flex justify-end mb-2">
+                  <Button type="button" class="" @click="addHerd">
+                    <span class="btn-icon"><i class="pi pi-plus"></i></span>
+                    Adicionar rebanho
+                  </Button>
+                </div>
+
+                <div class="space-y-3">
+                  <div v-for="(herd, idx) in local.herds" :key="idx" class="accordion">
+                    <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleHerd(idx)">
+                      <div class="title">
+                        <i class="pi" :class="herd.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
+                        <span class="ml-4">Rebanho {{ idx + 1 }} — {{ herd.species || 'Sem espécie' }}</span>
+                      </div>
+                      <div class="actions">
+                        <Button label="Danger" severity="danger" @click.stop="removeHerd(idx)">
+                          <i class="pi pi-trash"></i>
+                        </Button>
+                      </div>
+                    </div>
+                    <div v-show="herd.open" class="mt-3 p-2">
+                      <div class="grid grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1">
+                          <label>Espécie</label>
+                          <InputText type="text" v-model="herd.species" placeholder="Ex.: Bovino" />
+                        </div>
+                        <div class="flex flex-col gap-1">
+                          <label>Quantidade</label>
+                          <InputText type="text" v-model="herd.quantity" placeholder="Ex.: 100" />
+                        </div>
+                        <div class="flex flex-col gap-1">
+                          <label>Finalidade</label>
+                          <InputText type="text" v-model="herd.purpose" placeholder="Ex.: Leite, Carne, Lã" />
                         </div>
                       </div>
                     </div>
@@ -97,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import InputText from 'primevue/inputtext'
 import Tabs from 'primevue/tabs'
 import TabList from 'primevue/tablist'
@@ -105,41 +148,23 @@ import Tab from 'primevue/tab'
 import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
 import Button from 'primevue/button'
+import Select from 'primevue/select'
+import type { PropertyForm } from '@/types/property'
+import type { Producer } from '@/types/producer'
+import { useProducerStore } from '@/stores/producer'
 
-interface PropertyForm {
-  name: string
-  municipality: string
-  state: string
-  state_registration?: string | null
-  total_area: string
-  open?: boolean
-}
-interface ProducerForm {
-  name: string
-  cpf_cnpj: string
-  phone?: string | null
-  email?: string | null
-  address?: string | null
-  registration_date?: string | null
-  properties: PropertyForm[]
-}
+const producerStore = useProducerStore()
 
 const props = defineProps<{
   modelValue: boolean
-  value: ProducerForm
+  value: PropertyForm
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', v: boolean): void
-  (e: 'save', v: ProducerForm): void
+  (e: 'save', v: PropertyForm): void
 }>()
 
-const local = ref<ProducerForm>(props.value)
-
-watch(() => props.value, (nv) => {
-  console.log(nv, 'nv')
-  Object.assign(local.value, JSON.parse(JSON.stringify(nv)))
-})
 
 function close() {
   emit('update:modelValue', false)
@@ -149,19 +174,47 @@ function submit() {
   emit('save', local.value)
 }
 
-function addProperty() {
-  local.value.properties.push({ name: '', municipality: '', state: '', state_registration: '', total_area: '', open: true })
+
+function addProductionUnit() {
+  local.value.productionUnits?.push(
+    { crop_name: '', total_area_ha: '', geographic_coordinates: '', open: true }
+  )
+}
+function removeProductionUnit(index: number) {
+  local.value.productionUnits?.splice(index, 1)
+}
+function toggleProductionUnit(index: number) {
+  const prodUnit = local.value.productionUnits?.[index]
+  if (!prodUnit) return
+  prodUnit.open = !prodUnit.open
 }
 
-function removeProperty(index: number) {
-  local.value.properties.splice(index, 1)
+
+const addHerd = () => {
+  local.value.herds?.push(
+    { species: '', quantity: '', purpose: '', update_date: '', property_id: null }
+  )
+}
+const removeHerd = (index: number) => {
+  local.value.herds?.splice(index, 1)
+}
+const toggleHerd = (index: number) => {
+  const herd = local.value.herds?.[index]
+  if (!herd) return
+  herd.open = !herd.open
 }
 
-function toggleProperty(index: number) {
-  const item = local.value.properties[index]
-  if (!item) return
-  item.open = !item.open
-}
+const local = ref<PropertyForm>(props.value)
+watch(() => props.value, (nv) => {
+  console.log(nv, 'nv')
+  Object.assign(local.value, JSON.parse(JSON.stringify(nv)))
+})
+
+const producers = ref<Producer[]>([])
+onMounted(async () => {
+  await producerStore.list()
+  producers.value = producerStore.producers
+})
 </script>
 
 <style scoped>

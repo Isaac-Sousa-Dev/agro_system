@@ -1,27 +1,27 @@
 <template>
   <div v-if="modelValue" class="modal-backdrop" @click.self="close">
     <div class="modal">
-      <h3 class="text-black text-lg font-bold mb-2">Detalhes do Produtor</h3>
+      <h3 class="text-black text-lg font-bold mb-2">Detalhes da Propriedade</h3>
       <div class="details">
         <div class="flex flex-col">
           <strong>Nome:</strong>
           <span>{{ value.name }}</span>
         </div>
         <div class="flex flex-col">
-          <strong>CPF/CNPJ:</strong>
-          <span v-mask="'cpf_cnpj'">{{ value.cpf_cnpj }}</span>
+          <strong>Município:</strong>
+          <span>{{ value.municipality }}</span>
         </div>
         <div class="flex flex-col">
-          <strong>Telefone:</strong>
-          <span v-mask="'phone'">{{ value.phone || '-' }}</span>
+          <strong>UF:</strong>
+          <span>{{ value.state || '-' }}</span>
         </div>
         <div class="flex flex-col">
-          <strong>E-mail:</strong>
-          <span>{{ value.email || '-' }}</span>
+          <strong>Inscrição Estadual:</strong>
+          <span>{{ value.state_registration || '-' }}</span>
         </div>
         <div class="flex flex-col">
-          <strong>Endereço:</strong>
-          <span>{{ value.address || '-' }}</span>
+          <strong>Área total (ha):</strong>
+          <span>{{ value.total_area || '-' }}</span>
         </div>
         <div class="flex flex-col"><strong>Criado em:</strong>
           <span v-mask="'datetime'">{{ value.created_at }}</span>
@@ -41,9 +41,9 @@
 
 <script setup lang="ts">
 import Button from 'primevue/button'
-import type { Producer } from '@/types/producer'
+import type { Property } from '@/types/property';
 
-defineProps<{ modelValue: boolean, value: Producer }>()
+defineProps<{ modelValue: boolean, value: Property }>()
 const emit = defineEmits<{ (e: 'update:modelValue', v: boolean): void }>()
 
 function close() { emit('update:modelValue', false) }

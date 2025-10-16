@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('species');
             $table->integer('quantity');
             $table->string('purpose');
-            $table->date('update_date');
             $table->foreignId('property_id')->constrained('properties')->onDelete('cascade');
             $table->timestamps();
         });

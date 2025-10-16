@@ -14,12 +14,7 @@ class Herd extends Model
         'species',
         'quantity',
         'purpose',
-        'update_date',
         'property_id',
-    ];
-
-    protected $casts = [
-        'update_date' => 'date',
     ];
 
     public function property(): BelongsTo

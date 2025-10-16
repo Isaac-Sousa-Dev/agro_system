@@ -1,12 +1,20 @@
 export interface Herd {
   id: number;
-  propriedade_id: number; // FK -> propriedades.id
-  especie: string;
-  quantidade: number;
-  finalidade?: string | null;
-  data_atualizacao?: string | null; // date (YYYY-MM-DD)
+  species: string;
+  quantity: string;
+  purpose: string;
+  update_date?: string | null;
+  property_id?: number | null;
   created_at: string;
   updated_at: string;
 }
 
+export interface HerdForm {
+  species: string;
+  quantity: string;
+  purpose: string;
+  update_date?: string | null;
+  property_id?: number | null;
+  open?: boolean;
+}
 

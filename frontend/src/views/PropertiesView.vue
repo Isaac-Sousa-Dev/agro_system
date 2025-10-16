@@ -68,111 +68,13 @@
       />
     </div>
 
-    <!-- Criar -->
-    <div v-if="showCreate" class="modal-backdrop">
-      <div class="modal">
-        <h3>Nova Propriedade</h3>
-        <form @submit.prevent="submitCreate" class="form-grid">
-          <div>
-            <label>Produtor (ID)</label>
-            <input v-model.number="form.farmer_id" class="input" type="number" min="1" required />
-          </div>
-          <div class="col-span-2">
-            <label>Nome</label>
-            <input v-model="form.name" class="input" required />
-          </div>
-          <div>
-            <label>Município</label>
-            <input v-model="form.municipality" class="input" required />
-          </div>
-          <div>
-            <label>UF</label>
-            <input v-model="form.state" class="input" maxlength="2" required />
-          </div>
-          <div>
-            <label>Inscrição Estadual</label>
-            <input v-model="form.state_registration" class="input" />
-          </div>
-          <div>
-            <label>Área Total (ha)</label>
-            <input v-model.number="form.total_area" class="input" type="number" step="0.01" min="0" required />
-          </div>
-          <div class="modal-actions col-span-2">
-            <button type="button" class="btn-secondary" @click="showCreate = false">Cancelar</button>
-            <button class="btn-primary" type="submit">Salvar</button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <PropertyCreateModal v-model="showCreate" :value="form" @save="handleCreate" />
 
-    <!-- Editar -->
-    <div v-if="showEdit" class="modal-backdrop">
-      <div class="modal">
-        <h3>Editar Propriedade</h3>
-        <form @submit.prevent="submitEdit" class="form-grid">
-          <div>
-            <label>Produtor (ID)</label>
-            <input v-model.number="form.farmer_id" class="input" type="number" min="1" required />
-          </div>
-          <div class="col-span-2">
-            <label>Nome</label>
-            <input v-model="form.name" class="input" required />
-          </div>
-          <div>
-            <label>Município</label>
-            <input v-model="form.municipality" class="input" required />
-          </div>
-          <div>
-            <label>UF</label>
-            <input v-model="form.state" class="input" maxlength="2" required />
-          </div>
-          <div>
-            <label>Inscrição Estadual</label>
-            <input v-model="form.state_registration" class="input" />
-          </div>
-          <div>
-            <label>Área Total (ha)</label>
-            <input v-model.number="form.total_area" class="input" type="number" step="0.01" min="0" required />
-          </div>
-          <div class="modal-actions col-span-2">
-            <button type="button" class="btn-secondary" @click="showEdit = false">Cancelar</button>
-            <button class="btn-primary" type="submit">Salvar Alterações</button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <PropertyEditModal v-model="showEdit" :value="form" @save="handleEdit" />
 
-    <!-- Ver -->
-    <div v-if="showView && selected" class="modal-backdrop">
-      <div class="modal">
-        <h3>Detalhes da Propriedade</h3>
-        <div class="details">
-          <div><strong>Nome:</strong> {{ selected.name }}</div>
-          <div><strong>Produtor ID:</strong> {{ selected.farmer_id }}</div>
-          <div><strong>Município:</strong> {{ selected.municipality }}</div>
-          <div><strong>UF:</strong> {{ selected.state }}</div>
-          <div><strong>Inscrição Estadual:</strong> {{ selected.state_registration || '-' }}</div>
-          <div><strong>Área Total (ha):</strong> {{ selected.total_area }}</div>
-          <div><strong>Criado em:</strong> <span v-mask="'datetime'">{{ selected.created_at }}</span></div>
-          <div><strong>Atualizado em:</strong> <span v-mask="'datetime'">{{ selected.updated_at }}</span></div>
-        </div>
-        <div class="modal-actions">
-          <button class="btn-secondary" @click="showView = false">Fechar</button>
-        </div>
-      </div>
-    </div>
+    <PropertyViewModal v-model="showView" :value="selected as Property" />
 
-    <!-- Confirmar Exclusão -->
-    <div v-if="showConfirmDelete && selected" class="modal-backdrop">
-      <div class="modal">
-        <h3>Confirmar Exclusão</h3>
-        <p>Tem certeza que deseja excluir a propriedade "{{ selected.name }}"?</p>
-        <div class="modal-actions">
-          <button class="btn-secondary" @click="showConfirmDelete = false">Cancelar</button>
-          <button class="btn-danger" @click="confirmDelete">Excluir</button>
-        </div>
-      </div>
-    </div>
+    <PropertyDeleteModal v-model="showConfirmDelete" :name="selected?.name || ''" @confirm="confirmDelete" />
   </div>
 </template>
 
@@ -180,27 +82,35 @@
 import { onMounted, reactive, ref, computed } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { usePropertyStore } from '@/stores/property'
-import type { Property } from '@/types/property'
+import type { Property, PropertyForm } from '@/types/property'
 import InputText from 'primevue/inputtext';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
-import Paginator from 'primevue/paginator'
+import Paginator from 'primevue/paginator';
+import PropertyCreateModal from '@/components/modals/property/PropertyCreateModal.vue';
+import PropertyEditModal from '@/components/modals/property/PropertyEditModal.vue';
+import PropertyViewModal from '@/components/modals/property/PropertyViewModal.vue';
+import PropertyDeleteModal from '@/components/modals/property/PropertyDeleteModal.vue';
 
 const store = usePropertyStore()
 const toast = useToast()
 const search = ref('')
 const showCreate = ref(false)
+
 const showEdit = ref(false)
 const showView = ref(false)
 const showConfirmDelete = ref(false)
 
-const form = reactive<Omit<Property, 'id' | 'created_at' | 'updated_at'>>({
-  farmer_id: 0,
+const form = reactive<PropertyForm>({
   name: '',
+  farmer_id: null,
   municipality: '',
   state: '',
   state_registration: '',
-  total_area: 0
+  total_area: '',
+  open: false,
+  productionUnits: [],
+  herds: []
 })
 
 const selected = ref<Property | null>(null)
@@ -208,10 +118,10 @@ const selected = ref<Property | null>(null)
 const filtered = computed(() => {
   if (!search.value) return store.properties
   const q = search.value.toLowerCase()
-  return store.properties.filter(p =>
-    p.name.toLowerCase().includes(q) ||
-    p.municipality.toLowerCase().includes(q) ||
-    p.state.toLowerCase().includes(q)
+  return store.properties.filter(property =>
+    property.name.toLowerCase().includes(q) ||
+    property.municipality.toLowerCase().includes(q) ||
+    property.state.toLowerCase().includes(q)
   )
 })
 
@@ -221,12 +131,13 @@ async function onPage(event: { first: number; rows: number; page: number }) {
 }
 
 function resetForm() {
-  form.farmer_id = 0
   form.name = ''
   form.municipality = ''
   form.state = ''
   form.state_registration = ''
-  form.total_area = 0
+  form.total_area = ''
+  form.productionUnits = []
+  form.herds = []
 }
 
 async function load() {
@@ -251,12 +162,13 @@ function openView(item: Property) {
 
 function openEdit(item: Property) {
   selected.value = item
-  form.farmer_id   = item.farmer_id
   form.name = item.name
   form.municipality = item.municipality
   form.state = item.state
   form.state_registration = item.state_registration ?? ''
-  form.total_area = item.total_area
+  form.total_area = item.total_area.toString()
+  form.productionUnits = item?.productionUnits ?? []
+  form.herds = item?.herds ?? []
   showEdit.value = true
 }
 
@@ -267,7 +179,7 @@ function openDelete(item: Property) {
 
 async function submitCreate() {
   try {
-    await store.create({ ...form })
+    await store.create({ ...form, productionUnits: form.productionUnits ?? [], herds: form.herds ?? [] })
     toast.add({ severity: 'success', summary: 'Propriedade', detail: 'Criada com sucesso', life: 2500 })
     showCreate.value = false
     resetForm()
@@ -275,6 +187,12 @@ async function submitCreate() {
     console.error(e)
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar propriedade', life: 3000 })
   }
+}
+
+function handleCreate(value: PropertyForm) {
+  console.log(value, 'value')
+  Object.assign(form, value);
+  void submitCreate()
 }
 
 async function submitEdit() {
@@ -287,6 +205,11 @@ async function submitEdit() {
     console.error(e)
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar propriedade', life: 3000 })
   }
+}
+
+function handleEdit(value: PropertyForm) {
+  Object.assign(form, value);
+  void submitEdit()
 }
 
 async function confirmDelete() {

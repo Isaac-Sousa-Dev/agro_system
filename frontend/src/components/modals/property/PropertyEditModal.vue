@@ -1,7 +1,11 @@
 <template>
-  <div v-if="modelValue" class="modal-backdrop" @click.self="close">
+  <div
+    v-if="modelValue"
+    class="modal-backdrop"
+    @click.self="close"
+  >
     <div class="modal">
-      <h3 class="text-black text-lg font-bold mb-2">Novo Produtor</h3>
+      <h3 class="text-black text-lg font-bold mb-2">Editar Produtor</h3>
       <form @submit.prevent="submit">
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
@@ -85,7 +89,7 @@
         </div>
         <div class="mt-4 flex justify-end gap-2">
           <Button label="Secondary" severity="secondary" class="bg-gray-200" @click="close">Cancelar</Button>
-          <Button class="px-10" type="submit">Salvar</Button>
+          <Button class="px-10" type="submit">Salvar Alterações</Button>
         </div>
       </form>
     </div>
@@ -101,12 +105,30 @@ import Tab from 'primevue/tab'
 import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
 import Button from 'primevue/button'
-import type { ProducerForm } from '@/types/producer'
+
+interface PropertyForm {
+  name: string
+  municipality: string
+  state: string
+  state_registration?: string | null
+  total_area: string
+  open?: boolean
+}
+interface ProducerForm {
+  name: string
+  cpf_cnpj: string
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+  registration_date?: string | null
+  properties: PropertyForm[]
+}
 
 const props = defineProps<{
   modelValue: boolean
   value: ProducerForm
 }>()
+
 const emit = defineEmits<{
   (e: 'update:modelValue', v: boolean): void
   (e: 'save', v: ProducerForm): void
@@ -115,6 +137,7 @@ const emit = defineEmits<{
 const local = ref<ProducerForm>(props.value)
 
 watch(() => props.value, (nv) => {
+  console.log(nv, 'nv')
   Object.assign(local.value, JSON.parse(JSON.stringify(nv)))
 })
 
@@ -127,7 +150,7 @@ function submit() {
 }
 
 function addProperty() {
-  local.value.properties.push({ name: '', municipality: '', state: '', state_registration: '', total_area: '', open: true, productionUnits: [], herds: [] })
+  local.value.properties.push({ name: '', municipality: '', state: '', state_registration: '', total_area: '', open: true })
 }
 
 function removeProperty(index: number) {

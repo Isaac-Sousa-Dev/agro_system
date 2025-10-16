@@ -105,24 +105,8 @@ import Tab from 'primevue/tab'
 import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
 import Button from 'primevue/button'
+import type { ProducerForm } from '@/types/producer'
 
-interface PropertyForm {
-  name: string
-  municipality: string
-  state: string
-  state_registration?: string | null
-  total_area: string
-  open?: boolean
-}
-interface ProducerForm {
-  name: string
-  cpf_cnpj: string
-  phone?: string | null
-  email?: string | null
-  address?: string | null
-  registration_date?: string | null
-  properties: PropertyForm[]
-}
 
 const props = defineProps<{
   modelValue: boolean
@@ -150,7 +134,7 @@ function submit() {
 }
 
 function addProperty() {
-  local.value.properties.push({ name: '', municipality: '', state: '', state_registration: '', total_area: '', open: true })
+  local.value.properties.push({ name: '', municipality: '', state: '', state_registration: '', total_area: '', open: true, productionUnits: [], herds: [] })
 }
 
 function removeProperty(index: number) {

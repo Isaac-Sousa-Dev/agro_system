@@ -85,10 +85,10 @@
 import { onMounted, reactive, ref, computed } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { useProducerStore } from '@/stores/producer'
-import type { Producer } from '@/types/producer'
+import type { Producer, ProducerForm } from '@/types/producer'
 import InputText from 'primevue/inputtext';
 import Paginator from 'primevue/paginator'
-import type { Property } from '@/types/property';
+import type { Property, PropertyForm } from '@/types/property';
 import ProducerCreateModal from '@/components/modals/producer/ProducerCreateModal.vue'
 import ProducerEditModal from '@/components/modals/producer/ProducerEditModal.vue'
 import ProducerViewModal from '@/components/modals/producer/ProducerViewModal.vue'
@@ -103,25 +103,6 @@ const showCreate = ref(false)
 const showEdit = ref(false)
 const showView = ref(false)
 const showConfirmDelete = ref(false)
-
-interface PropertyForm {
-  name: string
-  municipality: string
-  state: string
-  state_registration?: string | null
-  total_area: string,
-  open?: boolean,
-  farmer_id?: number | null
-}
-interface ProducerForm {
-  name: string
-  cpf_cnpj: string
-  phone?: string | null
-  email?: string | null
-  address?: string | null
-  registration_date?: string | null
-  properties: PropertyForm[]
-}
 
 const form = reactive<ProducerForm>({
   name: '',
@@ -195,6 +176,8 @@ function openEdit(item: Producer) {
     state: property.state,
     state_registration: property.state_registration ?? '',
     total_area: property.total_area.toString(),
+    productionUnits: property.productionUnits ?? [],
+    herds: property.herds ?? []
   }))
   showEdit.value = true
 }

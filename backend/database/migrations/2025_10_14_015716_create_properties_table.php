@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('municipality');
             $table->string('state', 2);
             $table->string('state_registration')->nullable();
-            $table->decimal('total_area', 10, 2);
+            $table->string('total_area')->nullable();
             $table->foreignId('farmer_id')->constrained('farmers')->onDelete('cascade');
             $table->timestamps();
         });

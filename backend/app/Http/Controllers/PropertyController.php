@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PropertyRequest;
 use Illuminate\Http\Request;
 use App\Models\Property;
 use Illuminate\Http\JsonResponse;
@@ -47,30 +48,26 @@ class PropertyController extends Controller
             $query->where('farmer_id', $request->get('farmer_id'));
         }
 
-        $properties = $query->paginate(15);
+        $properties = $query->orderBy('id', 'desc')->paginate(6);
 
         return response()->json($properties);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): JsonResponse
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'municipality' => 'required|string|max:255',
-            'state' => 'required|string|max:2',
-            'state_registration' => 'nullable|string|max:255',
-            'total_area' => 'required|numeric|min:0',
-            'farmer_id' => 'required|exists:farmers,id',
-        ]);
 
-        $property = Property::create($request->all());
+    public function store(PropertyRequest $request): JsonResponse
+    {
+        try {
+            $property = $this->propertyService->create($request->all());
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Property not created',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
         return response()->json([
             'message' => 'Property created successfully',
-            'data' => $property->load(['farmer', 'productionUnits', 'herds'])
+            'data' => $property
         ], 201);
     }
 

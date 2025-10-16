@@ -199,7 +199,6 @@ const emit = defineEmits<{
   (e: 'validation-error', v: ValidationErrors): void
 }>()
 
-// Estado para armazenar erros de validação
 const validationErrors = ref<ValidationErrors>({})
 
 function close() {
@@ -207,26 +206,22 @@ function close() {
   emit('update:modelValue', false)
 }
 
-// Função para processar erros da API
 function setValidationErrors(errors: ValidationErrors) {
   validationErrors.value = errors
   emit('validation-error', errors)
 }
 
-// Função para limpar erros de um campo específico
 function clearFieldError(fieldName: string) {
   if (validationErrors.value[fieldName]) {
     delete validationErrors.value[fieldName]
   }
 }
 
-// Função para obter erro de um campo
 function getFieldError(fieldName: string): string | undefined {
   return validationErrors.value[fieldName]?.[0]
 }
 
 
-// Função para limpar todos os erros
 function clearAllErrors() {
   validationErrors.value = {}
 }
@@ -235,7 +230,6 @@ function submit() {
   emit('save', local.value)
 }
 
-// Expor funções para uso externo
 defineExpose({
   setValidationErrors,
   clearAllErrors,

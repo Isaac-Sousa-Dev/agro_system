@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductionUnitRequest;
 use App\Http\Resources\ProductionUnitResource;
 use App\Models\ProductionUnit;
+use App\Services\ProductionUnitService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ProductionUnitController extends Controller
 {
+    private $productionUnitService;
+    public function __construct(ProductionUnitService $productionUnitService)
+    {
+        $this->productionUnitService = $productionUnitService;
+    }
 
     public function index(Request $request): JsonResponse
     {
@@ -18,51 +25,43 @@ class ProductionUnitController extends Controller
             ->setStatusCode(200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(ProductionUnit $productionUnit): JsonResponse
     {
-        //
+        return (new ProductionUnitResource($productionUnit))
+            ->response()
+            ->setStatusCode(200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(ProductionUnitRequest $request): JsonResponse
     {
-        //
+        try {
+            $productionUnit = $this->productionUnitService->create($request->all());
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Production unit not created',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+        return (new ProductionUnitResource($productionUnit))
+            ->response()
+            ->setStatusCode(201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy(ProductionUnit $productionUnit): JsonResponse
     {
-        //
-    }
+        try {
+            $productionUnit = $this->productionUnitService->delete($productionUnit->id);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Production unit not deleted',
+                'error' => $e->getMessage()
+                ], 500);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'message' => 'Production unit deleted successfully'
+        ]);
     }
 }

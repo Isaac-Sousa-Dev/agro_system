@@ -1,19 +1,18 @@
 <template>
-  <div class="page">
-
-    <div class="text-black py-6">
-      <h1 class="text-3xl font-bold mb-2">Produtores</h1>
-      <p class="text-gray-500">Gerencie os produtores rurais cadastrados</p>
+  <div class="page-container">
+    <div class="page-header">
+      <h1>Produtores</h1>
+      <p>Gerencie os produtores rurais cadastrados</p>
     </div>
 
-    <div class="flex justify-between items-center mb-4">
-      <div class="w-full">
+    <div class="toolbar">
+      <div class="toolbar-left">
         <button class="btn-primary" @click="openCreate">
-          <span class="btn-icon"><i class="pi pi-plus"></i></span>
+          <i class="pi pi-plus"></i>
           Novo Produtor
         </button>
       </div>
-      <div class="w-full flex gap-2">
+      <div class="toolbar-right">
         <InputGroup>
             <InputText fluid type="text" v-model="search" placeholder="Buscar por nome, CPF/CNPJ, e-mail..." />
             <InputGroupAddon>
@@ -251,119 +250,3 @@ async function confirmDelete() {
 onMounted(load)
 </script>
 
-<style scoped>
-.page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 0;
-}
-
-.page-header {
-  margin-bottom: 1rem;
-}
-
-.page-header h1 {
-  font-size: 2rem;
-  color: #065f46;
-  margin: 0 0 0.5rem 0;
-  font-weight: 700;
-}
-
-.page-header p {
-  color: #6b7280;
-  margin: 0;
-}
-
-.toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.left, .right {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.input {
-  padding: 0.625rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-}
-
-.btn-primary, .btn-secondary, .btn-danger {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 0.9rem;
-  border-radius: 0.375rem;
-  border: 1px solid transparent;
-  cursor: pointer;
-}
-
-.btn-primary { background: #059669; color: #fff; }
-.btn-secondary { background: #f3f4f6; color: #374151; border-color: #d1d5db; }
-.btn-danger { background: #dc2626; color: #fff; }
-
-.btn-icon { font-size: 1rem; }
-
-.table-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  border-top: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-.page-btn {
-  background: #f3f4f6; border: 1px solid #d1d5db; color: #374151;
-  padding: 0.4rem 0.6rem; border-radius: 0.375rem; cursor: pointer;
-}
-.page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.page-info { color: #6b7280; font-size: 0.9rem; }
-
-.table { width: 100%; border-collapse: collapse; }
-.table thead { background: #f9fafb; }
-.table th, .table td { padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; text-align: left; }
-.table th { color: #374151; font-weight: 600; }
-.muted { color: #6b7280; text-align: center; }
-
-.row-actions { display: flex; gap: 0.25rem; }
-.icon { background: #f3f4f6; border: 1px solid #d1d5db; color: #374151; padding: 0.35rem; border-radius: 0.375rem; cursor: pointer; }
-.icon.danger { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
-
-.modal-backdrop {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-  display: flex; align-items: center; justify-content: center;
-  padding: 1rem; z-index: 1000;
-}
-
-.modal {
-  background: #fff; border-radius: 0.5rem; padding: 1rem; width: 100%; max-width: 720px;
-  border: 1px solid #e5e7eb;
-  max-height: 90vh; overflow-y: auto; position: relative; z-index: 1001;
-}
-
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-.form-grid label { display: block; margin-bottom: 0.25rem; color: #374151; font-weight: 500; }
-.form-grid .col-span-2 { grid-column: span 2; }
-
-.modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }
-
-.details { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 1rem 0; }
-
-@media (max-width: 768px) {
-  .form-grid { grid-template-columns: 1fr; }
-  .details { grid-template-columns: 1fr; }
-}
-</style>

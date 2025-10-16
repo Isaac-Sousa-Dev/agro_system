@@ -73,7 +73,7 @@ export const useProductionUnitStore = defineStore('productionUnit', () => {
             units.value.unshift(created);
             return created;
         } catch (err: unknown) {
-            error.value = (err as { message?: string })?.message ?? 'Falha ao criar unidade';
+            error.value = err instanceof Error ? err.message : 'Falha ao criar unidade de produção';
             throw err;
         } finally {
             loading.value = false;

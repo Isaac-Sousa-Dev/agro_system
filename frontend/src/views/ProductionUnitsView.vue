@@ -1,144 +1,73 @@
 <template>
   <div class="unidades-producao">
-    <div class="page-header">
-      <h1>🌾 Unidades de Produção</h1>
-      <p>Gerencie as unidades de produção das propriedades rurais</p>
+    <div class="text-black py-6">
+      <h1 class="text-3xl font-bold mb-2">Unidades de Produção</h1>
+      <p class="text-gray-500">Gerencie as unidades de produção das propriedades rurais</p>
     </div>
 
-    <div class="toolbar">
-      <div class="left">
+    <div class="flex justify-between items-center mb-4">
+      <div class="w-full">
         <button class="btn-primary" @click="openCreate">
           <span class="btn-icon"><i class="pi pi-plus"></i></span>
-          Nova Unidade
+          Nova Unidade de Produção
         </button>
       </div>
-      <div class="right">
-        <input class="input" v-model="search" placeholder="Buscar por cultura ou propriedade (ID)..." />
-        <button class="btn-secondary" @click="load"><i class="pi pi-refresh"></i></button>
-      </div>
+        <div class="w-full flex gap-2">
+          <InputGroup>
+              <InputText fluid type="text" v-model="search" placeholder="Buscar por cultura ou propriedade (ID)..." />
+              <InputGroupAddon>
+                  <span class="pi pi-search"></span>
+              </InputGroupAddon>
+          </InputGroup>
+          <button class="btn-secondary" @click="load">
+            <i class="pi pi-refresh"></i>
+          </button>
+        </div>
     </div>
 
-    <div class="table-card">
-      <div class="table-header">
-        <h3>Unidades de Produção</h3>
-      </div>
-      <table class="table">
-        <thead>
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <table class="w-full border-collapse">
+        <thead class="bg-gray-100">
           <tr>
-            <th>Propriedade ID</th>
             <th>Cultura</th>
-            <th>Área (ha)</th>
-            <th>Coordenadas</th>
-            <th style="width:1%">Ações</th>
+            <th>Propriedade</th>
+            <th>Coordenadas Geográficas</th>
+            <th>Total de Área (ha)</th>
+            <th style="width: 1%">Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="store.loading"><td colspan="5" class="muted">Carregando...</td></tr>
-          <tr v-else-if="!filtered.length"><td colspan="5" class="muted">Nenhuma unidade encontrada</td></tr>
-          <tr v-for="u in filtered" :key="u.id">
-            <td>{{ u.propriedade_id }}</td>
-            <td>{{ u.nome_cultura }}</td>
-            <td>{{ u.area_total_ha }}</td>
-            <td>{{ u.coordenadas_geograficas || '-' }}</td>
+          <tr v-if="store.loading">
+            <td colspan="6" class="muted">Carregando...</td>
+          </tr>
+          <tr v-else-if="!filtered.length">
+            <td colspan="6" class="muted">Nenhuma propriedade encontrada</td>
+          </tr>
+          <tr v-for="productionUnit in filtered" :key="productionUnit.id">
+            <td>{{ productionUnit.crop_name }}</td>
+            <td>{{ productionUnit.property?.name }}</td>
+            <td>{{ productionUnit.geographic_coordinates }}</td>
+            <td>{{ productionUnit.total_area_ha }}</td>
             <td>
               <div class="row-actions">
-                <button class="icon" @click="openView(u)" title="Ver"><i class="pi pi-eye"></i></button>
-                <button class="icon" @click="openEdit(u)" title="Editar"><i class="pi pi-pencil"></i></button>
-                <button class="icon danger" @click="openDelete(u)" title="Excluir"><i class="pi pi-trash"></i></button>
+                <button class="icon" title="Ver" @click="openView(productionUnit)"><i class="pi pi-eye"></i></button>
+                <button class="icon" title="Editar" @click="openEdit(productionUnit)"><i class="pi pi-pencil"></i></button>
+                <button class="icon danger" title="Excluir" @click="openDelete(productionUnit)"><i class="pi pi-trash"></i></button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
+      <Paginator
+        :first="(store.currentPage - 1) * store.perPage"
+        :rows="store.perPage"
+        :totalRecords="store.total"
+        @page="onPage"
+      />
     </div>
 
-    <!-- Criar -->
-    <div v-if="showCreate" class="modal-backdrop">
-      <div class="modal">
-        <h3>Nova Unidade de Produção</h3>
-        <form @submit.prevent="submitCreate" class="form-grid">
-          <div>
-            <label>Propriedade (ID)</label>
-            <input v-model.number="form.propriedade_id" class="input" type="number" min="1" required />
-          </div>
-          <div>
-            <label>Cultura</label>
-            <input v-model="form.nome_cultura" class="input" required />
-          </div>
-          <div>
-            <label>Área Total (ha)</label>
-            <input v-model.number="form.area_total_ha" class="input" type="number" step="0.01" min="0" required />
-          </div>
-          <div class="col-span-2">
-            <label>Coordenadas Geográficas</label>
-            <input v-model="form.coordenadas_geograficas" class="input" />
-          </div>
-          <div class="modal-actions col-span-2">
-            <button type="button" class="btn-secondary" @click="showCreate = false">Cancelar</button>
-            <button class="btn-primary" type="submit">Salvar</button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <ProductionUnitCreateModal v-model="showCreate" :value="form" @save="submitCreate" />
 
-    <!-- Editar -->
-    <div v-if="showEdit" class="modal-backdrop">
-      <div class="modal">
-        <h3>Editar Unidade</h3>
-        <form @submit.prevent="submitEdit" class="form-grid">
-          <div>
-            <label>Propriedade (ID)</label>
-            <input v-model.number="form.propriedade_id" class="input" type="number" min="1" required />
-          </div>
-          <div>
-            <label>Cultura</label>
-            <input v-model="form.nome_cultura" class="input" required />
-          </div>
-          <div>
-            <label>Área Total (ha)</label>
-            <input v-model.number="form.area_total_ha" class="input" type="number" step="0.01" min="0" required />
-          </div>
-          <div class="col-span-2">
-            <label>Coordenadas Geográficas</label>
-            <input v-model="form.coordenadas_geograficas" class="input" />
-          </div>
-          <div class="modal-actions col-span-2">
-            <button type="button" class="btn-secondary" @click="showEdit = false">Cancelar</button>
-            <button class="btn-primary" type="submit">Salvar Alterações</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Ver -->
-    <div v-if="showView && selected" class="modal-backdrop">
-      <div class="modal">
-        <h3>Detalhes da Unidade</h3>
-        <div class="details">
-          <div><strong>Propriedade ID:</strong> {{ selected.propriedade_id }}</div>
-          <div><strong>Cultura:</strong> {{ selected.nome_cultura }}</div>
-          <div><strong>Área Total (ha):</strong> {{ selected.area_total_ha }}</div>
-          <div><strong>Coordenadas:</strong> {{ selected.coordenadas_geograficas || '-' }}</div>
-          <div><strong>Criado em:</strong> <span v-mask="'datetime'">{{ selected.created_at }}</span></div>
-          <div><strong>Atualizado em:</strong> <span v-mask="'datetime'">{{ selected.updated_at }}</span></div>
-        </div>
-        <div class="modal-actions">
-          <button class="btn-secondary" @click="showView = false">Fechar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Confirmar Exclusão -->
-    <div v-if="showConfirmDelete && selected" class="modal-backdrop">
-      <div class="modal">
-        <h3>Confirmar Exclusão</h3>
-        <p>Tem certeza que deseja excluir a unidade de "{{ selected.nome_cultura }}"?</p>
-        <div class="modal-actions">
-          <button class="btn-secondary" @click="showConfirmDelete = false">Cancelar</button>
-          <button class="btn-danger" @click="confirmDelete">Excluir</button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -147,6 +76,10 @@ import { onMounted, ref, reactive, computed } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { useProductionUnitStore } from '@/stores/productionUnit'
 import type { ProductionUnit } from '@/types/productionUnit'
+import InputText from 'primevue/inputtext';
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
+import ProductionUnitCreateModal from '@/components/modals/productionUnit/ProductionUnitCreateModal.vue';
 
 const store = useProductionUnitStore()
 const toast = useToast()
@@ -157,10 +90,10 @@ const showView = ref(false)
 const showConfirmDelete = ref(false)
 
 const form = reactive<Omit<ProductionUnit, 'id' | 'created_at' | 'updated_at'>>({
-  propriedade_id: 0,
-  nome_cultura: '',
-  area_total_ha: 0,
-  coordenadas_geograficas: ''
+  property_id: null,
+  crop_name: '',
+  total_area_ha: '',
+  geographic_coordinates: ''
 })
 
 const selected = ref<ProductionUnit | null>(null)
@@ -169,22 +102,28 @@ const filtered = computed(() => {
   if (!search.value) return store.units
   const q = search.value.toLowerCase()
   return store.units.filter(u =>
-    u.nome_cultura.toLowerCase().includes(q) || String(u.propriedade_id).includes(q)
+    u.crop_name.toLowerCase().includes(q) || String(u.property_id).includes(q)
   )
 })
 
+async function onPage(event: { first: number; rows: number; page: number }) {
+  const nextPage = (event.page ?? 0) + 1
+  await store.list(nextPage, event.rows)
+}
+
 function resetForm() {
-  form.propriedade_id = 0
-  form.nome_cultura = ''
-  form.area_total_ha = 0
-  form.coordenadas_geograficas = ''
+  form.property_id = 0
+  form.crop_name = ''
+  form.total_area_ha = ''
+  form.geographic_coordinates = ''
 }
 
 async function load() {
   try {
     await store.list()
-    toast.add({ severity: 'success', summary: 'Unidades', detail: 'Lista atualizada', life: 2000 })
-  } catch (e) {
+    // toast.add({ severity: 'success', summary: 'Unidades', detail: 'Lista atualizada', life: 2000 })
+  } catch (e: unknown) {
+    console.error(e)
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar unidades', life: 3000 })
   }
 }
@@ -192,10 +131,10 @@ function openCreate() { resetForm(); showCreate.value = true }
 function openView(item: ProductionUnit) { selected.value = item; showView.value = true }
 function openEdit(item: ProductionUnit) {
   selected.value = item
-  form.propriedade_id = item.propriedade_id
-  form.nome_cultura = item.nome_cultura
-  form.area_total_ha = item.area_total_ha
-  form.coordenadas_geograficas = item.coordenadas_geograficas ?? ''
+  form.property_id = item.property_id
+  form.crop_name = item.crop_name
+  form.total_area_ha = item.total_area_ha
+  form.geographic_coordinates = item.geographic_coordinates ?? ''
   showEdit.value = true
 }
 function openDelete(item: ProductionUnit) { selected.value = item; showConfirmDelete.value = true }
@@ -206,30 +145,33 @@ async function submitCreate() {
     toast.add({ severity: 'success', summary: 'Unidade', detail: 'Criada com sucesso', life: 2500 })
     showCreate.value = false
     resetForm()
-  } catch (e) {
+  } catch (e: unknown) {
+    console.error(e)
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar unidade', life: 3000 })
   }
 }
-async function submitEdit() {
-  if (!selected.value) return
-  try {
-    await store.update(selected.value.id, { ...form })
-    toast.add({ severity: 'success', summary: 'Unidade', detail: 'Atualizada com sucesso', life: 2500 })
-    showEdit.value = false
-  } catch (e) {
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar unidade', life: 3000 })
-  }
-}
-async function confirmDelete() {
-  if (!selected.value) return
-  try {
-    await store.remove(selected.value.id)
-    toast.add({ severity: 'success', summary: 'Unidade', detail: 'Excluída com sucesso', life: 2500 })
-    showConfirmDelete.value = false
-  } catch (e) {
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir unidade', life: 3000 })
-  }
-}
+// async function submitEdit() {
+//   if (!selected.value) return
+//   try {
+//     await store.update(selected.value.id, { ...form })
+//     toast.add({ severity: 'success', summary: 'Unidade', detail: 'Atualizada com sucesso', life: 2500 })
+//     showEdit.value = false
+//   } catch (e: unknown) {
+//     console.error(e)
+//     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar unidade', life: 3000 })
+//   }
+// }
+// async function confirmDelete() {
+//   if (!selected.value) return
+//   try {
+//     await store.remove(selected.value.id)
+//     toast.add({ severity: 'success', summary: 'Unidade', detail: 'Excluída com sucesso', life: 2500 })
+//     showConfirmDelete.value = false
+//   } catch (e: unknown) {
+//     console.error(e)
+//     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir unidade', life: 3000 })
+//   }
+// }
 
 onMounted(load)
 </script>
@@ -349,16 +291,13 @@ onMounted(load)
 }
 
 .btn-primary, .btn-secondary {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.875rem 1rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
+  padding: 0.625rem 0.9rem;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  text-decoration: none;
 }
 
 .btn-primary {

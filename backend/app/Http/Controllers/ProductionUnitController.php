@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductionUnitResource;
+use App\Models\ProductionUnit;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ProductionUnitController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    public function index(Request $request): JsonResponse
     {
-        //
+        $productionUnits = ProductionUnit::with('property')->orderBy('id', 'desc')->paginate(6);
+        return ProductionUnitResource::collection($productionUnits)
+            ->response()
+            ->setStatusCode(200);
     }
 
     /**

@@ -21,13 +21,12 @@ export const usePropertyStore = defineStore('property', () => {
     try {
       const response = await api.get('/properties');
       const payload = response.data;
-
       if(payload && Array.isArray(payload.data)) {
         properties.value = payload.data;
-        currentPage.value = payload.current_page ?? page;
-        lastPage.value = payload.last_page ?? 1;
-        perPage.value = Number(payload.per_page ?? per ?? payload.data.length ?? 0);
-        total.value = Number(payload.total ?? payload.data.length ?? 0);
+        currentPage.value = payload.meta.current_page ?? page;
+        lastPage.value = payload.meta.last_page ?? 1;
+        perPage.value = Number(payload.meta.per_page ?? per ?? payload.data.length ?? 0);
+        total.value = Number(payload.meta.total ?? payload.data.length ?? 0);
         links.value = payload.links ?? [];
       } else {
         properties.value = payload;

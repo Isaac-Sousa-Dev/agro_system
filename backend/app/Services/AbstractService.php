@@ -29,7 +29,9 @@ abstract class AbstractService
 
     public function update(array $data, $id)
     {
-        return $this->model->find($id)->update($data);
+        $model = $this->model->find($id);
+        $model->update($data);
+        return $model;
     }
 
 

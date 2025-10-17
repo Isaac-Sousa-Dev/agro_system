@@ -1,43 +1,47 @@
 <template>
-  <div v-if="modelValue" class="modal-backdrop" @click.self="close">
+  <div
+    v-if="modelValue"
+    class="modal-backdrop"
+    @click.self="close"
+  >
     <div class="modal">
-      <h3 class="text-black text-lg font-bold mb-2">Nova Unidade de Produção</h3>
+      <h3 class="text-black text-lg font-bold mb-2">Editar Unidade de Produção</h3>
       <form @submit.prevent="submit">
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
-            <label>Cultura*</label>
+            <label>Espécie*</label>
             <Select
-              :options="crops"
+              :options="species"
               optionLabel="name"
               placeholder="Selecione uma cultura"
               optionValue="id"
-              v-model="local.crop_name"
-              :invalid="!!getFieldError('crop_name')"
-              @change="clearFieldError('crop_name')"
+              v-model="local.species"
+              :invalid="!!getFieldError('species')"
+              @change="clearFieldError('species')"
             />
-            <small v-if="getFieldError('crop_name')" class="text-red-500 text-xs">{{ getFieldError('crop_name') }}</small>
+            <small v-if="getFieldError('species')" class="text-red-500 text-xs">{{ getFieldError('species') }}</small>
           </div>
           <div class="flex flex-col gap-1">
-            <label>Área Total (ha)*</label>
+            <label>Quantidade*</label>
             <InputText
               type="text"
-              v-model="local.total_area_ha"
-              :invalid="!!getFieldError('total_area_ha')"
+              v-model="local.quantity"
+              :invalid="!!getFieldError('quantity')"
               placeholder="Ex.: 10000"
-              @input="clearFieldError('total_area_ha')"
+              @input="clearFieldError('quantity')"
             />
-            <small v-if="getFieldError('total_area_ha')" class="text-red-500 text-xs">{{ getFieldError('total_area_ha') }}</small>
+            <small v-if="getFieldError('quantity')" class="text-red-500 text-xs">{{ getFieldError('quantity') }}</small>
           </div>
           <div class="flex flex-col gap-1">
-            <label>Coordenadas Geográficas*</label>
+            <label>Finalidade*</label>
             <InputText
               type="text"
-              v-model="local.geographic_coordinates"
-              :invalid="!!getFieldError('geographic_coordinates')"
-              placeholder="Ex.: -20.5482404,-42.8711134"
-              @input="clearFieldError('geographic_coordinates')"
+              v-model="local.purpose"
+              :invalid="!!getFieldError('purpose')"
+              placeholder="Ex.: Leite, Carne, Lã, etc."
+              @input="clearFieldError('purpose')"
             />
-            <small v-if="getFieldError('geographic_coordinates')" class="text-red-500 text-xs">{{ getFieldError('geographic_coordinates') }}</small>
+            <small v-if="getFieldError('purpose')" class="text-red-500 text-xs">{{ getFieldError('purpose') }}</small>
           </div>
           <div class="flex flex-col gap-1">
             <label>Propriedade*</label>
@@ -53,10 +57,9 @@
             <small v-if="getFieldError('property_id')" class="text-red-500 text-xs">{{ getFieldError('property_id') }}</small>
           </div>
         </div>
-
         <div class="mt-4 flex justify-end gap-2">
           <Button label="Secondary" severity="secondary" class="bg-gray-200" @click="close">Cancelar</Button>
-          <Button class="px-10" type="submit">Salvar</Button>
+          <Button class="px-10" type="submit">Salvar Alterações</Button>
         </div>
       </form>
     </div>
@@ -69,8 +72,8 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
 import { usePropertyStore } from '@/stores/property'
-import type { ProductionUnitForm } from '@/types/productionUnit'
 import type { Property } from '@/types/property'
+import type { HerdForm } from '@/types/herd'
 
 interface ValidationErrors {
   [key: string]: string[]
@@ -78,21 +81,15 @@ interface ValidationErrors {
 
 const propertyStore = usePropertyStore()
 
-const crops = ref([
-  { id: 'Laranja Pera', name: 'Laranja Pera' },
-  { id: 'Melancia Crimson Sweet', name: 'Melancia Crimson Sweet' },
-  { id: 'Goiaba Paluma', name: 'Goiaba Paluma' },
+const species = ref([
+  { id: 'Suíno', name: 'Suíno' },
+  { id: 'Caprino', name: 'Caprino' },
+  { id: 'Bovino', name: 'Bovino' },
 ])
 
 const props = defineProps<{
   modelValue: boolean
-  value: ProductionUnitForm
-}>()
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', v: boolean): void
-  (e: 'save', v: ProductionUnitForm): void
-  (e: 'validation-error', v: ValidationErrors): void
+  value: HerdForm
 }>()
 
 const validationErrors = ref<ValidationErrors>({})
@@ -101,6 +98,13 @@ function close() {
   validationErrors.value = {}
   emit('update:modelValue', false)
 }
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', v: boolean): void
+  (e: 'save', v: HerdForm): void
+  (e: 'validation-error', v: ValidationErrors): void
+}>()
+
 
 function setValidationErrors(errors: ValidationErrors) {
   validationErrors.value = errors
@@ -131,8 +135,9 @@ defineExpose({
   validationErrors
 })
 
-const local = ref<ProductionUnitForm>(props.value)
+const local = ref<HerdForm>(props.value)
 watch(() => props.value, (nv) => {
+  console.log(nv, 'nv')
   Object.assign(local.value, JSON.parse(JSON.stringify(nv)))
 })
 

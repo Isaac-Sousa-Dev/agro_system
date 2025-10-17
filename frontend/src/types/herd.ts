@@ -7,6 +7,13 @@ export interface Herd {
   property_id?: number | null;
   created_at: string;
   updated_at: string;
+  property?: {
+    id: number;
+    name: string;
+    municipality: string;
+    state: string;
+    state_registration?: string | null;
+  }
 }
 
 export interface HerdForm {

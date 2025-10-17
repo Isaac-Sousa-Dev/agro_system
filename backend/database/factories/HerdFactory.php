@@ -16,7 +16,7 @@ class HerdFactory extends Factory
     public function definition(): array
     {
         return [
-            'species' => $this->faker->randomElement(['Bovino', 'Caprino', 'Ovino', 'Suíno', 'Aves']),
+            'species' => $this->faker->randomElement(['Suíno', 'Caprino', 'Bovino']),
             'quantity' => $this->faker->numberBetween(5, 500),
             'purpose' => $this->faker->randomElement(['Leite', 'Corte', 'Reprodução', 'Ovos']),
             'property_id' => Property::factory(),

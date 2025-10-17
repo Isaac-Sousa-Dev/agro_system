@@ -66,7 +66,31 @@
       />
     </div>
 
-    <ProductionUnitCreateModal v-model="showCreate" :value="form" @save="submitCreate" />
+    <ProductionUnitCreateModal
+      ref="createModalRef"
+      v-model="showCreate"
+      :value="form"
+      @save="submitCreate"
+    />
+
+    <ProductionUnitEditModal
+      ref="editModalRef"
+      v-model="showEdit"
+      :value="form"
+      @save="submitEdit"
+    />
+
+    <ProductionUnitViewModal
+      ref="viewModalRef"
+      v-model="showView"
+      :value="selected as ProductionUnit"
+    />
+
+    <ProductionUnitDeleteModal
+      v-model="showConfirmDelete"
+      :name="selected?.crop_name || ''"
+      @confirm="confirmDelete"
+    />
 
   </div>
 </template>
@@ -81,6 +105,9 @@ import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import Paginator from 'primevue/paginator';
 import ProductionUnitCreateModal from '@/components/modals/productionUnit/ProductionUnitCreateModal.vue';
+import ProductionUnitEditModal from '@/components/modals/productionUnit/ProductionUnitEditModal.vue';
+import ProductionUnitViewModal from '@/components/modals/productionUnit/ProductionUnitViewModal.vue';
+import ProductionUnitDeleteModal from '@/components/modals/productionUnit/ProductionUnitDeleteModal.vue';
 
 const store = useProductionUnitStore()
 const toast = useToast()
@@ -89,6 +116,8 @@ const showCreate = ref(false)
 const showEdit = ref(false)
 const showView = ref(false)
 const showConfirmDelete = ref(false)
+const createModalRef = ref()
+const editModalRef = ref()
 
 const form = reactive<Omit<ProductionUnit, 'id' | 'created_at' | 'updated_at'>>({
   property_id: null,
@@ -113,7 +142,7 @@ async function onPage(event: { first: number; rows: number; page: number }) {
 }
 
 function resetForm() {
-  form.property_id = 0
+  form.property_id = null
   form.crop_name = ''
   form.total_area_ha = ''
   form.geographic_coordinates = ''
@@ -122,14 +151,20 @@ function resetForm() {
 async function load() {
   try {
     await store.list()
-    // toast.add({ severity: 'success', summary: 'Unidades', detail: 'Lista atualizada', life: 2000 })
   } catch (e: unknown) {
     console.error(e)
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar unidades', life: 3000 })
   }
 }
-function openCreate() { resetForm(); showCreate.value = true }
+
+function openCreate() {
+  resetForm();
+  showCreate.value = true
+  createModalRef.value?.clearAllErrors()
+}
+
 function openView(item: ProductionUnit) { selected.value = item; showView.value = true }
+
 function openEdit(item: ProductionUnit) {
   selected.value = item
   form.property_id = item.property_id
@@ -138,6 +173,7 @@ function openEdit(item: ProductionUnit) {
   form.geographic_coordinates = item.geographic_coordinates ?? ''
   showEdit.value = true
 }
+
 function openDelete(item: ProductionUnit) { selected.value = item; showConfirmDelete.value = true }
 
 async function submitCreate() {
@@ -146,33 +182,55 @@ async function submitCreate() {
     toast.add({ severity: 'success', summary: 'Unidade', detail: 'Criada com sucesso', life: 2500 })
     showCreate.value = false
     resetForm()
+    load()
   } catch (e: unknown) {
     console.error(e)
+    if (e && typeof e === 'object' && 'response' in e) {
+      const error = e as { response?: { data?: { errors?: Record<string, string[]> } } }
+      if (error.response?.data?.errors) {
+        createModalRef.value?.setValidationErrors(error.response.data.errors)
+        toast.add({ severity: 'error', summary: 'Erro', detail: 'Verifique os campos obrigatórios', life: 3000 })
+        return
+      }
+    }
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar unidade', life: 3000 })
   }
 }
-// async function submitEdit() {
-//   if (!selected.value) return
-//   try {
-//     await store.update(selected.value.id, { ...form })
-//     toast.add({ severity: 'success', summary: 'Unidade', detail: 'Atualizada com sucesso', life: 2500 })
-//     showEdit.value = false
-//   } catch (e: unknown) {
-//     console.error(e)
-//     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar unidade', life: 3000 })
-//   }
-// }
-// async function confirmDelete() {
-//   if (!selected.value) return
-//   try {
-//     await store.remove(selected.value.id)
-//     toast.add({ severity: 'success', summary: 'Unidade', detail: 'Excluída com sucesso', life: 2500 })
-//     showConfirmDelete.value = false
-//   } catch (e: unknown) {
-//     console.error(e)
-//     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir unidade', life: 3000 })
-//   }
-// }
+
+async function submitEdit() {
+  if (!selected.value) return
+  try {
+    await store.update(selected.value.id, { ...form })
+    toast.add({ severity: 'success', summary: 'Unidade', detail: 'Atualizada com sucesso', life: 2500 })
+    showEdit.value = false
+    resetForm()
+    load()
+  } catch (e: unknown) {
+    console.error(e)
+    if (e && typeof e === 'object' && 'response' in e) {
+      const error = e as { response?: { data?: { errors?: Record<string, string[]> } } }
+      if (error.response?.data?.errors) {
+        editModalRef.value?.setValidationErrors(error.response.data.errors)
+        toast.add({ severity: 'error', summary: 'Erro', detail: 'Verifique os campos obrigatórios', life: 3000 })
+        return
+      }
+    }
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar unidade', life: 3000 })
+  }
+}
+
+async function confirmDelete() {
+  if (!selected.value) return
+  try {
+    await store.remove(selected.value.id)
+    toast.add({ severity: 'success', summary: 'Unidade', detail: 'Excluída com sucesso', life: 2500 })
+    showConfirmDelete.value = false
+    load()
+  } catch (e: unknown) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao excluir unidade', life: 3000 })
+  }
+}
 
 onMounted(load)
 </script>

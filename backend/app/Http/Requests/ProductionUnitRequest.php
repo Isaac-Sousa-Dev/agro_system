@@ -25,17 +25,17 @@ class ProductionUnitRequest extends FormRequest
             'crop_name' => 'required|string|max:255',
             'total_area_ha' => 'required|numeric|min:0',
             'geographic_coordinates' => 'required|string|max:255',
-            'property_id' => 'required|exists:properties,id',
+            'property_id' => 'required',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'crop_name.required' => 'The crop name is required',
-            'crop_name.string' => 'The crop name must be a string',
-            'crop_name.max' => 'The crop name must be less than 255 characters',
-            'total_area_ha.required' => 'The total area is required',
+            'crop_name.required' => 'O nome da cultura é obrigatório',
+            'total_area_ha.required' => 'A área total é obrigatória',
+            'geographic_coordinates.required' => 'As coordenadas geográficas são obrigatórias',
+            'property_id.required' => 'A propriedade é obrigatória',
         ];
     }
 }

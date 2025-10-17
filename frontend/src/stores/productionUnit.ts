@@ -15,33 +15,30 @@ export const useProductionUnitStore = defineStore('productionUnit', () => {
     const links = ref<Array<{ url: string, label: string, active: boolean }>>([])
 
 
-    const list = async (page = 1, per: number = perPage.value, params?: { propertyId?: number }) => {
+    const list = async (page = 1, per: number = perPage.value) => {
         loading.value = true;
         error.value = null;
         try {
-
-            if (units.value.length == 0) {
-                const response = await api.get('/production-units', { params: params ?? {} });
-
-                const payload = response.data;
-                if (payload && Array.isArray(payload.data)) {
-                    units.value = payload.data;
-                    currentPage.value = payload.current_page ?? page;
-                    lastPage.value = payload.last_page ?? 1;
-                    perPage.value = Number(payload.per_page ?? per ?? payload.data.length ?? 0);
-                    total.value = Number(payload.total ?? payload.data.length ?? 0);
-                    links.value = payload.links ?? [];
-                } else {
-                    units.value = payload;
-                    currentPage.value = 1;
-                    lastPage.value = 1;
-                    perPage.value = payload?.length ?? 0;
-                    total.value = payload?.length ?? 0;
-                    links.value = [];
-                }
+            const response = await api.get('/production-units', { params: { page, per_page: per } });
+            const payload = response.data;
+            if (payload && Array.isArray(payload.data)) {
+                units.value = payload.data;
+                currentPage.value = payload.meta.current_page ?? page;
+                lastPage.value = payload.meta.last_page ?? 1;
+                perPage.value = Number(payload.meta.per_page ?? per ?? payload.data.length ?? 0);
+                total.value = Number(payload.meta.total ?? payload.data.length ?? 0);
+                links.value = payload.links ?? [];
+            } else {
+                units.value = payload;
+                currentPage.value = 1;
+                lastPage.value = 1;
+                perPage.value = payload?.length ?? 0;
+                total.value = payload?.length ?? 0;
+                links.value = [];
             }
             return units.value;
         } catch (err: unknown) {
+            console.log(err, 'err')
             error.value = err instanceof Error ? err.message : 'Falha ao carregar unidades de produção';
             throw err;
         } finally {
@@ -73,6 +70,7 @@ export const useProductionUnitStore = defineStore('productionUnit', () => {
             units.value.unshift(created);
             return created;
         } catch (err: unknown) {
+            console.log(err, 'errr')
             error.value = err instanceof Error ? err.message : 'Falha ao criar unidade de produção';
             throw err;
         } finally {

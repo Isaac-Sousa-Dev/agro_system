@@ -5,130 +5,57 @@
     @click.self="close"
   >
     <div class="modal">
-      <h3 class="text-black text-lg font-bold mb-2">Editar Propriedade</h3>
+      <h3 class="text-black text-lg font-bold mb-2">Editar Unidade de Produção</h3>
       <form @submit.prevent="submit">
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
-            <label>Nome</label>
-            <InputText type="text" v-model="local.name" placeholder="Ex.: Fazenda São João"  />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label>Município</label>
-            <InputText type="text" v-model="local.municipality" placeholder="Ex.: Viçosa do Ceará" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label>UF</label>
-            <InputText v-model="local.state" placeholder="Ex.: CE" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label>Área Total (ha)</label>
-            <InputText type="text" v-model="local.total_area" placeholder="00000" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label>Inscrição Estadual</label>
-            <InputText type="text" v-model="local.state_registration" placeholder="Opcional" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label>Produtor</label>
+            <label>Cultura*</label>
             <Select
-              :options="producers"
+              :options="crops"
               optionLabel="name"
-              placeholder="Selecione um produtor"
+              placeholder="Selecione uma cultura"
               optionValue="id"
-              v-model="local.farmer_id" />
+              v-model="local.crop_name"
+              :invalid="!!getFieldError('crop_name')"
+              @change="clearFieldError('crop_name')"
+            />
+            <small v-if="getFieldError('crop_name')" class="text-red-500 text-xs">{{ getFieldError('crop_name') }}</small>
           </div>
-        </div>
-
-        <div class="mt-4">
-          <Tabs value="0">
-            <TabList>
-              <Tab value="0">Unidades de Produção</Tab>
-              <Tab value="1">Rebanhos</Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel value="0">
-                <div class="flex justify-end mb-2">
-                  <Button type="button" class="" @click="addProductionUnit">
-                    <span class="btn-icon"><i class="pi pi-plus"></i></span>
-                    Adicionar Unidade de Produção
-                  </Button>
-                </div>
-
-                <div class="space-y-3">
-                  <div v-for="(prop, idx) in local.productionUnits" :key="idx" class="accordion">
-                    <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleProductionUnit(idx)">
-                      <div class="title">
-                        <i class="pi" :class="prop.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                        <span class="ml-4">Unidade de Produção {{ idx + 1 }} — {{ prop.crop_name || 'Sem nome' }}</span>
-                      </div>
-                      <div class="actions">
-                        <Button label="Danger" severity="danger" @click.stop="removeProductionUnit(idx)">
-                          <i class="pi pi-trash"></i>
-                        </Button>
-                      </div>
-                    </div>
-                    <div v-show="prop.open" class="mt-3 p-2">
-                      <div class="grid grid-cols-2 gap-4">
-                        <div class="flex flex-col gap-1">
-                          <label>Nome da cultura</label>
-                          <InputText type="text" v-model="prop.crop_name" placeholder="Ex.: Soja" />
-                        </div>
-                        <div class="flex flex-col gap-1">
-                          <label>Área Total (ha)</label>
-                          <InputText type="text" v-model="prop.total_area_ha" placeholder="00000" />
-                        </div>
-                        <div class="flex flex-col gap-1">
-                          <label>Coordenadas Geográficas</label>
-                          <InputText type="text" v-model="prop.geographic_coordinates" placeholder="Ex.: -20.5482404,-42.8711134" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </TabPanel>
-
-              <TabPanel value="1">
-                <div class="flex justify-end mb-2">
-                  <Button type="button" class="" @click="addHerd">
-                    <span class="btn-icon"><i class="pi pi-plus"></i></span>
-                    Adicionar rebanho
-                  </Button>
-                </div>
-
-                <div class="space-y-3">
-                  <div v-for="(herd, idx) in local.herds" :key="idx" class="accordion">
-                    <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleHerd(idx)">
-                      <div class="title">
-                        <i class="pi" :class="herd.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                        <span class="ml-4">Rebanho {{ idx + 1 }} — {{ herd.species || 'Sem espécie' }}</span>
-                      </div>
-                      <div class="actions">
-                        <Button label="Danger" severity="danger" @click.stop="removeHerd(idx)">
-                          <i class="pi pi-trash"></i>
-                        </Button>
-                      </div>
-                    </div>
-                    <div v-show="herd.open" class="mt-3 p-2">
-                      <div class="grid grid-cols-2 gap-4">
-                        <div class="flex flex-col gap-1">
-                          <label>Espécie</label>
-                          <InputText type="text" v-model="herd.species" placeholder="Ex.: Bovino" />
-                        </div>
-                        <div class="flex flex-col gap-1">
-                          <label>Quantidade</label>
-                          <InputText type="text" v-model="herd.quantity" placeholder="Ex.: 100" />
-                        </div>
-                        <div class="flex flex-col gap-1">
-                          <label>Finalidade</label>
-                          <InputText type="text" v-model="herd.purpose" placeholder="Ex.: Leite, Carne, Lã" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
+          <div class="flex flex-col gap-1">
+            <label>Área Total (ha)*</label>
+            <InputText
+              type="text"
+              v-model="local.total_area_ha"
+              :invalid="!!getFieldError('total_area_ha')"
+              placeholder="Ex.: 10000"
+              @input="clearFieldError('total_area_ha')"
+            />
+            <small v-if="getFieldError('total_area_ha')" class="text-red-500 text-xs">{{ getFieldError('total_area_ha') }}</small>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label>Coordenadas Geográficas*</label>
+            <InputText
+              type="text"
+              v-model="local.geographic_coordinates"
+              :invalid="!!getFieldError('geographic_coordinates')"
+              placeholder="Ex.: -20.5482404,-42.8711134"
+              @input="clearFieldError('geographic_coordinates')"
+            />
+            <small v-if="getFieldError('geographic_coordinates')" class="text-red-500 text-xs">{{ getFieldError('geographic_coordinates') }}</small>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label>Propriedade*</label>
+            <Select
+              :options="properties"
+              optionLabel="name"
+              placeholder="Selecione uma propriedade"
+              optionValue="id"
+              v-model="local.property_id"
+              :invalid="!!getFieldError('property_id')"
+              @change="clearFieldError('property_id')"
+            />
+            <small v-if="getFieldError('property_id')" class="text-red-500 text-xs">{{ getFieldError('property_id') }}</small>
+          </div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
           <Button label="Secondary" severity="secondary" class="bg-gray-200" @click="close">Cancelar</Button>
@@ -142,78 +69,82 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import InputText from 'primevue/inputtext'
-import Tabs from 'primevue/tabs'
-import TabList from 'primevue/tablist'
-import Tab from 'primevue/tab'
-import TabPanels from 'primevue/tabpanels'
-import TabPanel from 'primevue/tabpanel'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
-import type { PropertyForm } from '@/types/property'
-import type { Producer } from '@/types/producer'
-import { useProducerStore } from '@/stores/producer'
+import { usePropertyStore } from '@/stores/property'
+import type { ProductionUnitForm } from '@/types/productionUnit'
+import type { Property } from '@/types/property'
 
-const producerStore = useProducerStore()
+interface ValidationErrors {
+  [key: string]: string[]
+}
+
+const propertyStore = usePropertyStore()
+
+const crops = ref([
+  { id: 'Laranja Pera', name: 'Laranja Pera' },
+  { id: 'Melancia Crimson Sweet', name: 'Melancia Crimson Sweet' },
+  { id: 'Goiaba Paluma', name: 'Goiaba Paluma' },
+])
 
 const props = defineProps<{
   modelValue: boolean
-  value: PropertyForm
+  value: ProductionUnitForm
 }>()
+
+const validationErrors = ref<ValidationErrors>({})
+
+function close() {
+  validationErrors.value = {}
+  emit('update:modelValue', false)
+}
 
 const emit = defineEmits<{
   (e: 'update:modelValue', v: boolean): void
-  (e: 'save', v: PropertyForm): void
+  (e: 'save', v: ProductionUnitForm): void
+  (e: 'validation-error', v: ValidationErrors): void
 }>()
 
 
-function close() {
-  emit('update:modelValue', false)
+function setValidationErrors(errors: ValidationErrors) {
+  validationErrors.value = errors
+  emit('validation-error', errors)
+}
+
+function clearFieldError(fieldName: string) {
+  if (validationErrors.value[fieldName]) {
+    delete validationErrors.value[fieldName]
+  }
+}
+
+function getFieldError(fieldName: string): string | undefined {
+  return validationErrors.value[fieldName]?.[0]
+}
+
+function clearAllErrors() {
+  validationErrors.value = {}
 }
 
 function submit() {
   emit('save', local.value)
 }
 
+defineExpose({
+  setValidationErrors,
+  clearAllErrors,
+  validationErrors
+})
 
-function addProductionUnit() {
-  local.value.productionUnits?.push(
-    { crop_name: '', total_area_ha: '', geographic_coordinates: '', open: true }
-  )
-}
-function removeProductionUnit(index: number) {
-  local.value.productionUnits?.splice(index, 1)
-}
-function toggleProductionUnit(index: number) {
-  const prodUnit = local.value.productionUnits?.[index]
-  if (!prodUnit) return
-  prodUnit.open = !prodUnit.open
-}
-
-
-const addHerd = () => {
-  local.value.herds?.push(
-    { species: '', quantity: '', purpose: '', update_date: '', property_id: null }
-  )
-}
-const removeHerd = (index: number) => {
-  local.value.herds?.splice(index, 1)
-}
-const toggleHerd = (index: number) => {
-  const herd = local.value.herds?.[index]
-  if (!herd) return
-  herd.open = !herd.open
-}
-
-const local = ref<PropertyForm>(props.value)
+const local = ref<ProductionUnitForm>(props.value)
 watch(() => props.value, (nv) => {
   console.log(nv, 'nv')
   Object.assign(local.value, JSON.parse(JSON.stringify(nv)))
 })
 
-const producers = ref<Producer[]>([])
+const properties = ref<Property[]>([])
 onMounted(async () => {
-  await producerStore.list()
-  producers.value = producerStore.producers
+  await propertyStore.list()
+  properties.value = propertyStore.properties
 })
 </script>
 

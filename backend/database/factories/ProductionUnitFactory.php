@@ -16,7 +16,7 @@ class ProductionUnitFactory extends Factory
     public function definition(): array
     {
         return [
-            'crop_name' => $this->faker->randomElement(['Soja', 'Milho', 'Feijão', 'Algodão', 'Arroz']),
+            'crop_name' => $this->faker->randomElement(['Laranja Pera', 'Melancia Crimson Sweet', 'Goiaba Paluma']),
             'total_area_ha' => $this->faker->randomFloat(2, 0.5, 500),
             'geographic_coordinates' => $this->faker->optional()->latitude() . ',' . $this->faker->optional()->longitude(),
             'property_id' => Property::factory(),

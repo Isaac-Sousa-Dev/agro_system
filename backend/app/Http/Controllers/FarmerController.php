@@ -78,7 +78,7 @@ class FarmerController extends Controller
         return response()->json([
             'message' => 'Farmer updated successfully',
             'data' => $farmer->load('properties')
-        ]);
+        ], 200);
     }
 
 

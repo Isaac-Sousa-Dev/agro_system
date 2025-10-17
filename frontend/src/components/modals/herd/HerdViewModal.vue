@@ -4,16 +4,16 @@
       <h3 class="text-black text-lg font-bold mb-2">Detalhes da Unidade de Produção</h3>
       <div class="details">
         <div class="flex flex-col">
-          <strong>Nome da cultura:</strong>
-          <span>{{ value.crop_name }}</span>
+          <strong>Espécie:</strong>
+          <span>{{ value.species }}</span>
         </div>
         <div class="flex flex-col">
-          <strong>Área total (ha):</strong>
-          <span>{{ value.total_area_ha }}</span>
+          <strong>Quantidade:</strong>
+          <span>{{ value.quantity }}</span>
         </div>
         <div class="flex flex-col">
-          <strong>Coordenadas Geográficas:</strong>
-          <span>{{ value.geographic_coordinates || '-' }}</span>
+          <strong>Finalidade:</strong>
+          <span>{{ value.purpose || '-' }}</span>
         </div>
         <div class="flex flex-col">
           <strong>Propriedade:</strong>
@@ -37,9 +37,9 @@
 
 <script setup lang="ts">
 import Button from 'primevue/button'
-import type { ProductionUnit } from '@/types/productionUnit';
+import type { Herd } from '@/types/herd';
 
-defineProps<{ modelValue: boolean, value: ProductionUnit }>()
+defineProps<{ modelValue: boolean, value: Herd }>()
 const emit = defineEmits<{ (e: 'update:modelValue', v: boolean): void }>()
 
 function close() { emit('update:modelValue', false) }

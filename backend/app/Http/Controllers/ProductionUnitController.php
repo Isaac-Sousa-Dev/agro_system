@@ -48,6 +48,22 @@ class ProductionUnitController extends Controller
             ->setStatusCode(201);
     }
 
+    public function update(ProductionUnitRequest $request, ProductionUnit $productionUnit): JsonResponse
+    {
+        try {
+            $productionUnit = $this->productionUnitService->update($request->all(), $productionUnit->id);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Production unit not updated',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+        return (new ProductionUnitResource($productionUnit))
+            ->response()
+            ->setStatusCode(200);
+    }
+
 
     public function destroy(ProductionUnit $productionUnit): JsonResponse
     {

@@ -11,7 +11,7 @@ class HerdRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,20 @@ class HerdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'species' => 'required|string|max:255',
+            'quantity' => 'required',
+            'property_id' => 'required',
+            'purpose' => 'required|string',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'species.required' => 'A espécie é obrigatória',
+            'quantity.required' => 'A quantidade é obrigatória',
+            'property_id.required' => 'A propriedade é obrigatória',
+            'purpose.required' => 'A finalidade é obrigatória',
         ];
     }
 }

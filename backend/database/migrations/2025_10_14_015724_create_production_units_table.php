@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('production_units', function (Blueprint $table) {
             $table->id();
             $table->string('crop_name');
-            $table->decimal('total_area_ha', 10, 2);
+            $table->string('total_area_ha');
             $table->string('geographic_coordinates')->nullable();
             $table->foreignId('property_id')->constrained('properties')->onDelete('cascade');
             $table->timestamps();

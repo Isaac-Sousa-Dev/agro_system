@@ -68,13 +68,29 @@
       />
     </div>
 
-    <PropertyCreateModal ref="createModalRef" v-model="showCreate" :value="form" @save="handleCreate" />
+    <PropertyCreateModal
+        ref="createModalRef"
+        v-model="showCreate"
+        :value="form"
+        @save="handleCreate"
+    />
 
-    <PropertyEditModal v-model="showEdit" :value="form" @save="handleEdit" />
+    <PropertyEditModal
+        v-model="showEdit"
+        :value="form"
+        @save="handleEdit"
+    />
 
-    <PropertyViewModal v-model="showView" :value="selected as Property" />
+    <PropertyViewModal
+        v-model="showView"
+        :value="selected as Property"
+    />
 
-    <PropertyDeleteModal v-model="showConfirmDelete" :name="selected?.name || ''" @confirm="confirmDelete" />
+    <PropertyDeleteModal
+        v-model="showConfirmDelete"
+        :name="selected?.name || ''"
+        @confirm="confirmDelete"
+    />
   </div>
 </template>
 
@@ -145,7 +161,6 @@ function resetForm() {
 async function load() {
   try {
     await store.list()
-    // toast.add({ severity: 'success', summary: 'Propriedades', detail: 'Lista atualizada', life: 2000 })
   } catch (e) {
     console.error(e)
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar propriedades', life: 3000 })
@@ -155,7 +170,6 @@ async function load() {
 function openCreate() {
   resetForm()
   showCreate.value = true
-  // Limpar erros de validação quando abrir o modal
   createModalRef.value?.clearAllErrors()
 }
 
@@ -190,12 +204,9 @@ async function submitCreate() {
     resetForm()
   } catch (e: unknown) {
     console.error(e)
-
-    // Verificar se há erros de validação
     if (e && typeof e === 'object' && 'response' in e) {
       const error = e as { response?: { data?: { errors?: Record<string, string[]> } } }
       if (error.response?.data?.errors) {
-        // Definir erros de validação no modal
         createModalRef.value?.setValidationErrors(error.response.data.errors)
         toast.add({ severity: 'error', summary: 'Erro', detail: 'Verifique os campos obrigatórios', life: 3000 })
         return

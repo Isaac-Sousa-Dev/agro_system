@@ -17,7 +17,8 @@ export interface Herd {
 }
 
 export interface HerdForm {
-  species: string;
+  species?: string;
+  species_id?: number | null;
   quantity: string;
   purpose: string;
   update_date?: string | null;

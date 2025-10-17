@@ -59,7 +59,7 @@
                     <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleProductionUnit(idx)">
                       <div class="title">
                         <i class="pi" :class="prop.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                        <span class="ml-4">Unidade de Produção {{ idx + 1 }} — {{ prop.crop_name || 'Sem nome' }}</span>
+                        <span class="ml-4">Unidade de Produção {{ idx + 1 }} — {{ getCropName(prop.crop_id) || 'Sem cultura' }}</span>
                       </div>
                       <div class="actions">
                         <Button label="Danger" severity="danger" @click.stop="removeProductionUnit(idx)">
@@ -70,11 +70,18 @@
                     <div v-show="prop.open" class="mt-3 p-2">
                       <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col gap-1">
-                          <label>Nome da cultura</label>
-                          <InputText type="text" v-model="prop.crop_name" placeholder="Ex.: Soja" />
+                          <label>Cultura*</label>
+                          <Select
+                            :options="CROPS"
+                            optionLabel="name"
+                            optionValue="id"
+                            v-model="prop.crop_id"
+                            placeholder="Selecione uma cultura"
+                            @change="onCropChange(idx, $event)"
+                          />
                         </div>
                         <div class="flex flex-col gap-1">
-                          <label>Área Total (ha)</label>
+                          <label>Área Total (ha)*</label>
                           <InputText type="text" v-model="prop.total_area_ha" placeholder="00000" />
                         </div>
                         <div class="flex flex-col gap-1">
@@ -100,7 +107,7 @@
                     <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleHerd(idx)">
                       <div class="title">
                         <i class="pi" :class="herd.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                        <span class="ml-4">Rebanho {{ idx + 1 }} — {{ herd.species || 'Sem espécie' }}</span>
+                        <span class="ml-4">Rebanho {{ idx + 1 }} — {{ getSpeciesName(herd.species_id) || 'Sem espécie' }}</span>
                       </div>
                       <div class="actions">
                         <Button label="Danger" severity="danger" @click.stop="removeHerd(idx)">
@@ -111,11 +118,18 @@
                     <div v-show="herd.open" class="mt-3 p-2">
                       <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col gap-1">
-                          <label>Espécie</label>
-                          <InputText type="text" v-model="herd.species" placeholder="Ex.: Bovino" />
+                          <label>Espécie*</label>
+                          <Select
+                            :options="SPECIES"
+                            optionLabel="name"
+                            optionValue="id"
+                            v-model="herd.species_id"
+                            placeholder="Selecione uma espécie"
+                            @change="onSpeciesChange(idx, $event)"
+                          />
                         </div>
                         <div class="flex flex-col gap-1">
-                          <label>Quantidade</label>
+                          <label>Quantidade*</label>
                           <InputText type="text" v-model="herd.quantity" placeholder="Ex.: 100" />
                         </div>
                         <div class="flex flex-col gap-1">
@@ -152,6 +166,7 @@ import Select from 'primevue/select'
 import type { PropertyForm } from '@/types/property'
 import type { Producer } from '@/types/producer'
 import { useProducerStore } from '@/stores/producer'
+import { CROPS, SPECIES } from '@/data/cropsAndSpecies'
 
 const producerStore = useProducerStore()
 
@@ -177,7 +192,7 @@ function submit() {
 
 function addProductionUnit() {
   local.value.productionUnits?.push(
-    { crop_name: '', total_area_ha: '', geographic_coordinates: '', open: true }
+    { crop_id: null, total_area_ha: '', geographic_coordinates: '', open: true }
   )
 }
 function removeProductionUnit(index: number) {
@@ -192,7 +207,7 @@ function toggleProductionUnit(index: number) {
 
 const addHerd = () => {
   local.value.herds?.push(
-    { species: '', quantity: '', purpose: '', update_date: '', property_id: null }
+    { species_id: null, quantity: '', purpose: '', update_date: '', property_id: null }
   )
 }
 const removeHerd = (index: number) => {
@@ -215,6 +230,40 @@ onMounted(async () => {
   await producerStore.list()
   producers.value = producerStore.producers
 })
+
+// Funções para lidar com mudanças nos selects
+function onCropChange(index: number, event: any) {
+  const cropId = event.value
+  const prodUnit = local.value.productionUnits?.[index]
+  if (prodUnit && cropId) {
+    const selectedCrop = CROPS.find(crop => crop.id === cropId)
+    if (selectedCrop) {
+      prodUnit.crop_name = selectedCrop.name
+    }
+  }
+}
+
+function onSpeciesChange(index: number, event: any) {
+  const speciesId = event.value
+  const herd = local.value.herds?.[index]
+  if (herd && speciesId) {
+    const selectedSpecies = SPECIES.find(species => species.id === speciesId)
+    if (selectedSpecies) {
+      herd.species = selectedSpecies.name
+    }
+  }
+}
+
+// Funções auxiliares para obter nomes
+function getCropName(cropId: number | null | undefined): string | undefined {
+  if (!cropId) return undefined
+  return CROPS.find(crop => crop.id === cropId)?.name
+}
+
+function getSpeciesName(speciesId: number | null | undefined): string | undefined {
+  if (!speciesId) return undefined
+  return SPECIES.find(species => species.id === speciesId)?.name
+}
 </script>
 
 <style scoped>

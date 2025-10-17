@@ -20,7 +20,8 @@ export interface ProductionUnit {
 }
 
 export interface ProductionUnitForm {
-  crop_name: string
+  crop_name?: string
+  crop_id?: number | null
   total_area_ha: string
   geographic_coordinates: string
   property_id?: number | null

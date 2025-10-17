@@ -13,7 +13,7 @@
         </button>
       </div>
       <div class="toolbar-right">
-        <input class="form-input" v-model="search" placeholder="Buscar por espécie ou propriedade (ID)..." />
+        <input class="form-input w-1/2" v-model="search" placeholder="Buscar por espécie ou propriedade (ID)..." />
         <button class="btn-secondary" @click="load"><i class="pi pi-refresh"></i></button>
       </div>
     </div>
@@ -108,6 +108,7 @@ const form = reactive<Omit<Herd, 'id' | 'created_at' | 'updated_at'>>({
   purpose: '',
   update_date: null
 })
+
 
 const selected = ref<Herd | null>(null)
 

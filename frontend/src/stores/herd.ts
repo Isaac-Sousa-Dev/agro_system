@@ -108,12 +108,27 @@ export const useHerdStore = defineStore('herd', () => {
         }
     };
 
+    const exportPdf = async (farmerId: number | null = null) => {
+      const response = await api.get('/herds/export/pdf', {
+        params: farmerId ? { farmer_id: farmerId } : {},
+        responseType: 'blob',
+        headers: { Accept: 'application/pdf' }
+      });
+
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'rebanhos.pdf';
+      link.click();
+    };
+
     return {
         list,
         getById,
         create,
         update,
         remove,
+        exportPdf,
         herd,
         herds,
         loading,

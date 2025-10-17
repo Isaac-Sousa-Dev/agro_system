@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\Property;
 use Illuminate\Http\JsonResponse;
 use App\Services\PropertyService;
+use App\Exports\PropertiesExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PropertyController extends Controller
 {
@@ -118,11 +121,100 @@ class PropertyController extends Controller
     }
 
 
-    public function export(Request $request): JsonResponse
+    public function export(Request $request)
     {
-        // This will be implemented later with Excel export
-        return response()->json([
-            'message' => 'Export functionality will be implemented'
-        ]);
+        try {
+            // Coletar filtros da requisição
+            $filters = $request->only(['search', 'municipality', 'state', 'farmer_id']);
+
+            // Gerar nome do arquivo com timestamp
+            $fileName = 'propriedades_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+
+            // Criar instância do export com filtros
+            $export = new PropertiesExport($filters);
+
+            // Retornar download do arquivo Excel
+            return Excel::download($export, $fileName);
+
+        } catch (\Exception $e) {
+            // Em caso de erro, retornar resposta JSON com erro
+            return response()->json([
+                'message' => 'Erro ao exportar propriedades',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function exportPreview(Request $request): JsonResponse
+    {
+        try {
+            // Coletar filtros da requisição
+            $filters = $request->only(['search', 'municipality', 'state', 'farmer_id']);
+
+            // Criar instância do export com filtros
+            $export = new PropertiesExport($filters);
+
+            // Obter dados para preview (limitado a 10 registros)
+            $query = Property::with(['farmer', 'productionUnits', 'herds']);
+
+            // Aplicar os mesmos filtros
+            if (isset($filters['search']) && !empty($filters['search'])) {
+                $search = $filters['search'];
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'ilike', "%{$search}%")
+                      ->orWhereHas('farmer', function($farmerQuery) use ($search) {
+                          $farmerQuery->where('name', 'ilike', "%{$search}%");
+                      });
+                });
+            }
+
+            if (isset($filters['municipality']) && !empty($filters['municipality'])) {
+                $query->where('municipality', $filters['municipality']);
+            }
+
+            if (isset($filters['state']) && !empty($filters['state'])) {
+                $query->where('state', $filters['state']);
+            }
+
+            if (isset($filters['farmer_id']) && !empty($filters['farmer_id'])) {
+                $query->where('farmer_id', $filters['farmer_id']);
+            }
+
+            $totalRecords = $query->count();
+            $previewData = $query->orderBy('id', 'desc')->limit(10)->get();
+
+            // Mapear dados para preview
+            $mappedData = $previewData->map(function($property) {
+                return [
+                    'id' => $property->id,
+                    'name' => $property->name,
+                    'municipality' => $property->municipality,
+                    'state' => $property->state,
+                    'state_registration' => $property->state_registration,
+                    'total_area' => number_format($property->total_area, 2, ',', '.'),
+                    'farmer_name' => $property->farmer->name ?? 'N/A',
+                    'farmer_cpf' => $property->farmer->cpf ?? 'N/A',
+                    'production_units_count' => $property->productionUnits->count(),
+                    'herds_count' => $property->herds->count(),
+                    'created_at' => $property->created_at->format('d/m/Y H:i:s'),
+                    'updated_at' => $property->updated_at->format('d/m/Y H:i:s'),
+                ];
+            });
+
+            return response()->json([
+                'message' => 'Preview da exportação gerado com sucesso',
+                'data' => [
+                    'total_records' => $totalRecords,
+                    'preview_records' => $mappedData,
+                    'filters_applied' => $filters
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao gerar preview da exportação',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

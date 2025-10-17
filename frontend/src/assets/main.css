@@ -38,59 +38,6 @@ body {
     padding-right: 2rem;
   }
 }
-
-.btn-primary {
-  background-color: #2563eb;
-  color: white;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s;
-}
-
-.btn-primary:hover {
-  background-color: #1d4ed8;
-}
-
-.btn-secondary {
-  background-color: #6b7280;
-  color: white;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s;
-}
-
-.btn-secondary:hover {
-  background-color: #4b5563;
-}
-
-.btn-success {
-  background-color: #059669;
-  color: white;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s;
-}
-
-.btn-success:hover {
-  background-color: #047857;
-}
-
-.btn-danger {
-  background-color: #dc2626;
-  color: white;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s;
-}
-
-.btn-danger:hover {
-  background-color: #b91c1c;
-}
-
 /* ===== COMPONENTES REUTILIZÁVEIS ===== */
 
 /* Layout de página */
@@ -131,7 +78,7 @@ body {
 }
 
 /* Botões */
-.btn-primary, .btn-secondary, .btn-danger {
+.btn-primary, .btn-secondary, .btn-danger, .btn-export {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -174,6 +121,14 @@ body {
   transform: translateY(-1px);
 }
 
+.btn-export {
+  background: #07a6ac;
+  color: #fff;
+}
+
+.btn-export:hover {
+  background: #068a8e;
+}
 .btn-icon {
   font-size: 1rem;
 }

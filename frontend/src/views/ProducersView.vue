@@ -58,6 +58,8 @@
                                         class="pi pi-pencil"></i></button>
                                 <button class="icon danger" title="Excluir" @click="openDelete(producer)"><i
                                         class="pi pi-trash"></i></button>
+                                <button class="icon" title="Exportar Rebanhos" @click="exportPdf(producer.id)"><i
+                                        class="pi pi-file-pdf"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -91,6 +93,9 @@ import ProducerViewModal from '@/components/modals/producer/ProducerViewModal.vu
 import ProducerDeleteModal from '@/components/modals/producer/ProducerDeleteModal.vue'
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
+import { useHerdStore } from '@/stores/herd'
+const herdStore = useHerdStore()
+
 
 const store = useProducerStore()
 const toast = useToast()
@@ -109,6 +114,15 @@ const form = reactive<ProducerForm>({
     registration_date: '',
     properties: [] as PropertyForm[]
 })
+
+const exportPdf = async (producerId: number) => {
+  try {
+    await herdStore.exportPdf(producerId)
+  } catch (e) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao exportar PDF', life: 3000 })
+  }
+}
 
 const selected = ref<Producer | null>(null)
 

@@ -13,6 +13,8 @@
         </button>
       </div>
       <div class="toolbar-right">
+        <!-- <button class="btn-primary bg-sky-400  text-white px-4 py-2 rounded-md hover:bg-sky-300 w-1/2 bg-gradient-to-r from-sky-400 to-sky-500 " @click="openCreateHerd">Exportar Excel</button> -->
+        <button @click="exportExcel" class="btn-export w-1/2">Exportar Excel</button>
         <InputGroup>
             <InputText fluid type="text" v-model="search" placeholder="Buscar por nome, município, UF..." />
             <InputGroupAddon>
@@ -164,6 +166,15 @@ async function load() {
   } catch (e) {
     console.error(e)
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar propriedades', life: 3000 })
+  }
+}
+
+const exportExcel = async () => {
+  try {
+    await store.exportExcel()
+  } catch (e) {
+    console.error(e)
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao exportar Excel', life: 3000 })
   }
 }
 

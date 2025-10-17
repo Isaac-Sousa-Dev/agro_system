@@ -44,3 +44,4 @@ export function useAuth() {
     clearError: authStore.clearError
   }
 }
+

@@ -113,12 +113,48 @@ export const usePropertyStore = defineStore('property', () => {
     }
   };
 
+  const exportExcel = async () => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const response = await api.get('/properties/export/excel', {
+        responseType: 'blob',
+        headers: {
+          Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        },
+      });
+
+      // tenta obter o filename do header
+      const disposition = response.headers['content-disposition'];
+      const fileNameMatch = disposition?.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
+      const fileName = fileNameMatch ? fileNameMatch[1].replace(/['"]/g, '') : 'properties.xlsx';
+
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      return true;
+    } catch (err: unknown) {
+      // se o backend retornar erro em JSON, converter o blob para texto/JSON para exibir
+      error.value = err instanceof Error ? err.message : 'Falha ao exportar Excel';
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     list,
     getById,
     create,
     update,
     remove,
+    exportExcel,
     property,
     properties,
     quantityProperties,

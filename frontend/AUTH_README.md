@@ -176,3 +176,4 @@ GET  /api/csrf-cookie
 2. **Redirecionamento infinito**: Verificar guards
 3. **Cookie não persistido**: Verificar configurações de segurança
 4. **CORS errors**: Verificar configuração do backend
+

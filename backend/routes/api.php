@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\PropertiesExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\ProductionUnitController;
 use App\Http\Controllers\HerdController;
+use Maatwebsite\Excel\Facades\Excel;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,7 +46,8 @@ Route::get('/', function () {
                 'GET /api/properties/{id}' => 'Show property',
                 'PUT /api/properties/{id}' => 'Update property',
                 'DELETE /api/properties/{id}' => 'Delete property',
-                'GET /api/properties/export' => 'Export properties to Excel'
+                'GET /api/properties/export/excel' => 'Export properties to Excel',
+                'GET /api/properties/export/preview' => 'Preview export data'
             ],
             'production-units' => [
                 'GET /api/production-units' => 'List production units',
@@ -58,7 +61,9 @@ Route::get('/', function () {
                 'POST /api/herds' => 'Create herd',
                 'GET /api/herds/{id}' => 'Show herd',
                 'PUT /api/herds/{id}' => 'Update herd',
-                'DELETE /api/herds/{id}' => 'Delete herd'
+                'DELETE /api/herds/{id}' => 'Delete herd',
+                'GET /api/herds/export/pdf' => 'Export herds to PDF by farmer',
+                'GET /api/herds/export/pdf/preview' => 'Preview herds PDF export'
             ]
         ]
     ]);
@@ -82,12 +87,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('farmers', FarmerController::class);
 
     // Properties
-    Route::apiResource('properties', PropertyController::class);
     Route::get('/properties/export/excel', [PropertyController::class, 'export']);
+    Route::get('/properties/export/preview', [PropertyController::class, 'exportPreview']);
+    Route::apiResource('properties', PropertyController::class);
+
+
 
     // Production Units
     Route::apiResource('production-units', ProductionUnitController::class);
 
     // Herds
+    Route::get('/herds/export/pdf', [HerdController::class, 'exportPdf']);
+    Route::get('/herds/export/pdf/preview', [HerdController::class, 'exportPdfPreview']);
     Route::apiResource('herds', HerdController::class);
 });
+
+

@@ -5,3 +5,4 @@ import LoginForm from '@/components/LoginForm.vue'
 <template>
   <LoginForm />
 </template>
+

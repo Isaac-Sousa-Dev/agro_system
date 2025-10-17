@@ -31,3 +31,4 @@ docker compose exec backend chown -R www-data:www-data /var/www/html
 
 echo "✅ Permissões corrigidas com sucesso!"
 echo "🎉 Agora você pode editar os arquivos do backend sem sudo!"
+

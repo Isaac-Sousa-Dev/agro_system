@@ -1,7 +1,3 @@
-# /sistema-agro/docker-compose.yml
-
-version: '3.8'
-
 services:
   # Serviço do Backend (Laravel + PHP-FPM)
   backend:

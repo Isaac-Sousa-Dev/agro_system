@@ -10,23 +10,60 @@
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
             <label>Nome</label>
-            <InputText type="text" v-model="local.name" placeholder="Digite o nome do produtor" />
+            <InputText
+              type="text"
+              v-model="local.name"
+              :invalid="!!getFieldError('name')"
+              placeholder="Digite o nome do produtor"
+              @input="clearFieldError('name')"
+            />
+            <small v-if="getFieldError('name')" class="text-red-500 text-xs">{{ getFieldError('name') }}</small>
           </div>
           <div class="flex flex-col gap-1">
             <label>CPF/CNPJ</label>
-            <InputText type="text" v-model="local.cpf_cnpj" v-mask="'cpf_cnpj'" placeholder="000.000.000-00" />
+            <InputText
+              type="text"
+              v-model="local.cpf_cnpj"
+              v-mask="'cpf_cnpj'"
+              :invalid="!!getFieldError('cpf_cnpj')"
+              placeholder="000.000.000-00"
+              @input="clearFieldError('cpf_cnpj')"
+            />
+            <small v-if="getFieldError('cpf_cnpj')" class="text-red-500 text-xs">{{ getFieldError('cpf_cnpj') }}</small>
           </div>
           <div class="flex flex-col gap-1">
             <label>Telefone</label>
-            <InputText type="text" v-model="local.phone" v-mask="'phone'" placeholder="(00) 00000-0000" />
+            <InputText
+              type="text"
+              v-model="local.phone"
+              v-mask="'phone'"
+              :invalid="!!getFieldError('phone')"
+              placeholder="(00) 00000-0000"
+              @input="clearFieldError('phone')"
+            />
+            <small v-if="getFieldError('phone')" class="text-red-500 text-xs">{{ getFieldError('phone') }}</small>
           </div>
           <div class="flex flex-col gap-1">
             <label>E-mail</label>
-            <InputText type="email" v-model="local.email" placeholder="exemplo@email.com" />
+            <InputText
+              type="email"
+              v-model="local.email"
+              :invalid="!!getFieldError('email')"
+              placeholder="exemplo@email.com"
+              @input="clearFieldError('email')"
+            />
+            <small v-if="getFieldError('email')" class="text-red-500 text-xs">{{ getFieldError('email') }}</small>
           </div>
           <div class="flex flex-col gap-1">
             <label>Endereço</label>
-            <InputText type="text" v-model="local.address" placeholder="Rua, número, bairro, cidade, estado" />
+            <InputText
+              type="text"
+              v-model="local.address"
+              :invalid="!!getFieldError('address')"
+              placeholder="Rua, número, bairro, cidade, estado"
+              @input="clearFieldError('address')"
+            />
+            <small v-if="getFieldError('address')" class="text-red-500 text-xs">{{ getFieldError('address') }}</small>
           </div>
         </div>
 
@@ -107,6 +144,9 @@ import TabPanel from 'primevue/tabpanel'
 import Button from 'primevue/button'
 import type { ProducerForm } from '@/types/producer'
 
+interface ValidationErrors {
+  [key: string]: string[]
+}
 
 const props = defineProps<{
   modelValue: boolean
@@ -116,13 +156,16 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', v: boolean): void
   (e: 'save', v: ProducerForm): void
+  (e: 'validation-error', v: ValidationErrors): void
 }>()
 
 const local = ref<ProducerForm>(props.value)
+const validationErrors = ref<ValidationErrors>({})
 
 watch(() => props.value, (nv) => {
   console.log(nv, 'nv')
   Object.assign(local.value, JSON.parse(JSON.stringify(nv)))
+  validationErrors.value = {}
 })
 
 function close() {
@@ -146,6 +189,26 @@ function toggleProperty(index: number) {
   if (!item) return
   item.open = !item.open
 }
+
+function setValidationErrors(errors: ValidationErrors) {
+  validationErrors.value = errors
+  emit('validation-error', errors)
+}
+
+function clearFieldError(fieldName: string) {
+  if (validationErrors.value[fieldName]) {
+    delete validationErrors.value[fieldName]
+  }
+}
+
+function getFieldError(fieldName: string): string | undefined {
+  return validationErrors.value[fieldName]?.[0]
+}
+
+defineExpose({
+  setValidationErrors,
+  validationErrors
+})
 </script>
 
 <style scoped>

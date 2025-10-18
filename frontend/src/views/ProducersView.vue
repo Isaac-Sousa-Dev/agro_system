@@ -70,8 +70,8 @@
         </div>
 
         <!-- Modais -->
-        <ProducerCreateModal v-model="showCreate" :value="form" @save="handleCreate" />
-        <ProducerEditModal v-model="showEdit" :value="form" @save="handleEdit" />
+        <ProducerCreateModal ref="createModalRef" v-model="showCreate" :value="form" @save="handleCreate" />
+        <ProducerEditModal ref="editModalRef" v-model="showEdit" :value="form" @save="handleEdit" />
         <ProducerViewModal v-model="showView" :value="selected as Producer" />
         <ProducerDeleteModal v-model="showConfirmDelete" :name="selected?.name || ''" @confirm="confirmDelete" />
 
@@ -104,6 +104,9 @@ const showCreate = ref(false)
 const showEdit = ref(false)
 const showView = ref(false)
 const showConfirmDelete = ref(false)
+
+const createModalRef = ref()
+const editModalRef = ref()
 
 const form = reactive<ProducerForm>({
     name: '',
@@ -220,7 +223,16 @@ async function submitCreate() {
         toast.add({ severity: 'success', summary: 'Produtor', detail: 'Criado com sucesso', life: 2500 })
         showCreate.value = false
         resetForm()
-    } catch {
+    } catch (e: unknown) {
+        console.error(e)
+        if (e && typeof e === 'object' && 'response' in e) {
+            const error = e as { response?: { data?: { errors?: Record<string, string[]> } } }
+            if (error.response?.data?.errors) {
+                createModalRef.value?.setValidationErrors(error.response.data.errors)
+                toast.add({ severity: 'error', summary: 'Erro', detail: 'Verifique os campos obrigatórios', life: 3000 })
+                return
+            }
+        }
         toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao criar produtor', life: 3000 })
     }
 }
@@ -236,7 +248,16 @@ async function submitEdit() {
         await store.update(selected.value.id, { ...form })
         toast.add({ severity: 'success', summary: 'Produtor', detail: 'Atualizado com sucesso', life: 2500 })
         showEdit.value = false
-    } catch {
+    } catch (e: unknown) {
+        console.error(e)
+        if (e && typeof e === 'object' && 'response' in e) {
+            const error = e as { response?: { data?: { errors?: Record<string, string[]> } } }
+            if (error.response?.data?.errors) {
+                editModalRef.value?.setValidationErrors(error.response.data.errors)
+                toast.add({ severity: 'error', summary: 'Erro', detail: 'Verifique os campos obrigatórios', life: 3000 })
+                return
+            }
+        }
         toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar produtor', life: 3000 })
     }
 }

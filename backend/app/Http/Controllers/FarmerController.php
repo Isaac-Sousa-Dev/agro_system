@@ -55,14 +55,6 @@ class FarmerController extends Controller
     }
 
 
-    public function show(Farmer $farmer): JsonResponse
-    {
-        return response()->json([
-            'data' => $farmer->load('properties.productionUnits', 'properties.herds')
-        ]);
-    }
-
-
     public function update(FormRequest $request, Farmer $farmer): JsonResponse
     {
         try {

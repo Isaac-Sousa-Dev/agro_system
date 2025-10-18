@@ -87,6 +87,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/properties/export/excel', [PropertyController::class, 'export']);
     Route::get('/properties/export/preview', [PropertyController::class, 'exportPreview']);
     Route::apiResource('properties', PropertyController::class);
+    Route::post('/upload/property/image', [PropertyController::class, 'uploadImage']);
 
     // Production Units
     Route::apiResource('production-units', ProductionUnitController::class);

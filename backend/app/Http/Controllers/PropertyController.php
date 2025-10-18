@@ -60,7 +60,7 @@ class PropertyController extends Controller
     }
 
 
-    public function store(PropertyRequest $request): JsonResponse
+    public function store(PropertyRequest $request)
     {
         try {
             $property = $this->propertyService->create($request->all(), $request->productionUnits, $request->herds);

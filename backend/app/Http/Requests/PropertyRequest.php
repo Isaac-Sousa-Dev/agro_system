@@ -28,6 +28,7 @@ class PropertyRequest extends FormRequest
             'state_registration' => 'nullable|string|max:255',
             'total_area' => 'required|numeric|min:0',
             'farmer_id' => 'required',
+            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 

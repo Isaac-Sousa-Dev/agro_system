@@ -51,7 +51,10 @@ const togglePasswordVisibility = () => {
   <div class="login-container">
     <div class="login-card">
       <div class="login-header">
-        <h1>🌱 Agro System</h1>
+        <div class="flex justify-center">
+          <img src="@/assets/logo_adagri.jpg"  width="200" alt="Agro System" class="login-logo"/>
+        </div>
+        <!-- <h1>Agro System</h1> -->
         <p>Faça login para acessar o sistema</p>
       </div>
 
@@ -87,7 +90,8 @@ const togglePasswordVisibility = () => {
               @click="togglePasswordVisibility"
               class="password-toggle"
             >
-              {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+              <i class="pi pi-eye" v-if="showPassword"></i>
+              <i class="pi pi-eye-slash" v-else></i>
             </button>
           </div>
           <span v-if="errors.password" class="error-message">{{ errors.password }}</span>
@@ -155,7 +159,7 @@ const togglePasswordVisibility = () => {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 5px;
 }
 
 .form-group {

@@ -2,9 +2,11 @@
   <aside class="sidebar" :class="{ 'sidebar-collapsed': collapsed }">
     <div class="sidebar-header">
       <div class="logo-section">
-        <div v-if="!collapsed" class="logo-text">
-          <h2>Agro System</h2>
-          <p>Sistema de Gestão</p>
+        <div v-if="!collapsed" class="">
+          <div class="">
+            <img src="@/assets/logo_adagri.jpg"  width="150" alt="Agro System" class="login-logo rounded-lg"/>
+          </div>
+          <p class="text-white text-sm mt-2">Sistema de Gestão Agropecuária</p>
         </div>
       </div>
 

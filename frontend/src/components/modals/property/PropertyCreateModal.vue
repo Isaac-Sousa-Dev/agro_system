@@ -3,6 +3,27 @@
     <div class="modal">
       <h3 class="text-black text-lg font-bold mb-2">Nova Propriedade</h3>
       <form @submit.prevent="submit">
+        <!-- <div class="card mb-4">
+          <FileUpload
+            ref="fileUpload"
+            name="image"
+            url="/api/upload/property/image"
+            @upload="onUpload"
+            @select="onSelect"
+            :auto="false"
+            customUpload
+            :showUploadButton="false"
+            :showCancelButton="false"
+            accept="image/*"
+            :maxFileSize="1000000"
+            :multiple="false"
+          >
+            <template #empty>
+              <span>Selecione uma imagem.</span>
+            </template>
+          </FileUpload>
+
+        </div> -->
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
             <label>Nome da propriedade*</label>
@@ -16,8 +37,21 @@
             <small v-if="getFieldError('name')" class="text-red-500 text-xs">{{ getFieldError('name') }}</small>
           </div>
           <div class="flex flex-col gap-1">
+              <label>CEP*</label>
+              <InputText
+                type="text"
+                v-model="cep"
+                v-mask="'cep'"
+                :invalid="!!getFieldError('cep')"
+                placeholder="Ex.: 61600-000"
+                @blur="handleCepSearch"
+              />
+              <small v-if="getFieldError('cep')" class="text-red-500 text-xs">{{ getFieldError('cep') }}</small>
+          </div>
+          <div class="flex flex-col gap-1">
             <label>Município*</label>
             <InputText
+              disabled
               type="text"
               v-model="local.municipality"
               :invalid="!!getFieldError('municipality')"
@@ -29,6 +63,7 @@
           <div class="flex flex-col gap-1">
             <label>UF*</label>
             <InputText
+              disabled
               type="text"
               v-model="local.state"
               v-mask="'state'"
@@ -88,7 +123,7 @@
                     <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleProductionUnit(idx)">
                       <div class="title">
                         <i class="pi" :class="prop.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                        <span class="ml-4">Unidade de Produção {{ idx + 1 }} — {{ getCropName(prop.crop_id) || 'Sem cultura' }}</span>
+                        <span class="ml-4">Unidade de Produção {{ idx + 1 }} — {{ getCropName(prop.crop_name) || 'Sem cultura' }}</span>
                       </div>
                       <div class="actions">
                         <Button label="Danger" severity="danger" @click.stop="removeProductionUnit(idx)">
@@ -136,7 +171,7 @@
                     <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleHerd(idx)">
                       <div class="title">
                         <i class="pi" :class="herd.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                        <span class="ml-4">Rebanho {{ idx + 1 }} — {{ getSpeciesName(herd.species_id) || 'Sem espécie' }}</span>
+                        <span class="ml-4">Rebanho {{ idx + 1 }} — {{ getSpeciesName(herd.species) || 'Sem espécie' }}</span>
                       </div>
                       <div class="actions">
                         <Button label="Danger" severity="danger" @click.stop="removeHerd(idx)">
@@ -196,10 +231,14 @@ import type { PropertyForm } from '@/types/property'
 import { useProducerStore } from '@/stores/producer'
 import type { Producer } from '@/types/producer'
 import { CROPS, SPECIES } from '@/data/cropsAndSpecies'
+// import FileUpload from 'primevue/fileupload'
+import { getAddressByCep } from '@/utils/cep'
 
 interface ValidationErrors {
   [key: string]: string[]
 }
+
+const cep = ref('')
 
 const producerStore = useProducerStore()
 
@@ -215,6 +254,36 @@ const emit = defineEmits<{
 }>()
 
 const validationErrors = ref<ValidationErrors>({})
+
+// import { useToast } from "primevue/usetoast";
+
+// const toast = useToast();
+
+// const onUpload = () => {
+//   toast.add({
+//     severity: "info",
+//     summary: "Sucesso",
+//     detail: "Imagem enviada com sucesso",
+//     life: 3000,
+//   });
+// };
+
+const handleCepSearch = async () => {
+  const result = await getAddressByCep(cep.value)
+
+  if (!result.success) {
+    setValidationErrors({
+      cep: [result.error?.message || 'CEP inválido']
+    })
+    local.value.municipality = ''
+    local.value.state = ''
+    return
+  }
+
+  clearFieldError('cep')
+  local.value.municipality = result.data?.localidade || ''
+  local.value.state = result.data?.uf || ''
+}
 
 function close() {
   validationErrors.value = {}
@@ -295,7 +364,7 @@ onMounted(async () => {
 })
 
 // Funções para lidar com mudanças nos selects
-function onCropChange(index: number, event: any) {
+function onCropChange(index: number, event: { value: string }) {
   const cropId = event.value
   const prodUnit = local.value.productionUnits?.[index]
   if (prodUnit && cropId) {
@@ -306,7 +375,7 @@ function onCropChange(index: number, event: any) {
   }
 }
 
-function onSpeciesChange(index: number, event: any) {
+function onSpeciesChange(index: number, event: { value: string }) {
   const speciesId = event.value
   const herd = local.value.herds?.[index]
   if (herd && speciesId) {
@@ -318,14 +387,14 @@ function onSpeciesChange(index: number, event: any) {
 }
 
 // Funções auxiliares para obter nomes
-function getCropName(cropId: number | null | undefined): string | undefined {
+function getCropName(cropId: string | null | undefined): string | undefined {
   if (!cropId) return undefined
-  return CROPS.find(crop => crop.id === cropId)?.name
+  return CROPS.find(crop => crop.name === cropId)?.name
 }
 
-function getSpeciesName(speciesId: number | null | undefined): string | undefined {
+function getSpeciesName(speciesId: string | null | undefined): string | undefined {
   if (!speciesId) return undefined
-  return SPECIES.find(species => species.id === speciesId)?.name
+  return SPECIES.find(species => species.name === speciesId)?.name
 }
 </script>
 

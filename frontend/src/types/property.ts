@@ -3,6 +3,7 @@ import type { ProductionUnitForm } from "./productionUnit";
 
 export interface Property {
   id: number;
+  image?: string | null,
   farmer_id?: number | null;
   name: string;
   municipality: string;
@@ -16,6 +17,7 @@ export interface Property {
 }
 
 export interface PropertyForm {
+  image?: string | null,
   name: string
   municipality: string
   state: string

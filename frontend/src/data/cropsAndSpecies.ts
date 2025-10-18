@@ -1,23 +1,23 @@
 // Lista de culturas disponíveis
 export const CROPS = [
-  { id: 1, name: 'Laranja Pera' },
-  { id: 2, name: 'Melancia Crimson Sweet' },
-  { id: 3, name: 'Goiaba Paluma' }
+  { id: 'Laranja Pera', name: 'Laranja Pera' },
+  { id: 'Melancia Crimson Sweet', name: 'Melancia Crimson Sweet' },
+  { id: 'Goiaba Paluma', name: 'Goiaba Paluma' }
 ]
 
 // Lista de espécies de animais disponíveis
 export const SPECIES = [
-  { id: 1, name: 'Suíno' },
-  { id: 2, name: 'Caprino' },
-  { id: 3, name: 'Bovino' }
+  { id: 'Suíno', name: 'Suíno' },
+  { id: 'Caprino', name: 'Caprino' },
+  { id: 'Bovino', name: 'Bovino' }
 ]
 
 export interface Crop {
-  id: number
+  id: string
   name: string
 }
 
 export interface Species {
-  id: number
+  id: string
   name: string
 }

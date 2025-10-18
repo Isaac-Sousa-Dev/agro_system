@@ -15,6 +15,7 @@ class Property extends Model
         'name',
         'municipality',
         'state',
+        'image',
         'state_registration',
         'total_area',
         'farmer_id',

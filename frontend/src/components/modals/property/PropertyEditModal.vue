@@ -7,18 +7,54 @@
     <div class="modal">
       <h3 class="text-black text-lg font-bold mb-2">Editar Propriedade</h3>
       <form @submit.prevent="submit">
+        <!-- <div class="card">
+            <Toast />
+            <FileUpload name="demo[]" url="/api/upload" :multiple="true" accept="image/*" :maxFileSize="1000000">
+                <template #empty>
+                    <span>Drag and drop files to here to upload.</span>
+                </template>
+            </FileUpload>
+        </div> -->
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
             <label>Nome</label>
             <InputText type="text" v-model="local.name" placeholder="Ex.: Fazenda São João"  />
           </div>
           <div class="flex flex-col gap-1">
+            <label>CEP</label>
+            <InputText
+              type="text"
+              v-model="cep"
+              v-mask="'cep'"
+              :invalid="!!getFieldError('cep')"
+              placeholder="Ex.: 61600-000"
+              @blur="handleCepSearch"
+            />
+            <small v-if="getFieldError('cep')" class="text-red-500 text-xs">{{ getFieldError('cep') }}</small>
+          </div>
+          <div class="flex flex-col gap-1">
             <label>Município</label>
-            <InputText type="text" v-model="local.municipality" placeholder="Ex.: Viçosa do Ceará" />
+            <InputText
+              disabled
+              type="text"
+              v-model="local.municipality"
+              :invalid="!!getFieldError('municipality')"
+              placeholder="Ex.: Viçosa do Ceará"
+              @input="clearFieldError('municipality')"
+            />
+            <small v-if="getFieldError('municipality')" class="text-red-500 text-xs">{{ getFieldError('municipality') }}</small>
           </div>
           <div class="flex flex-col gap-1">
             <label>UF</label>
-            <InputText v-model="local.state" placeholder="Ex.: CE" />
+            <InputText
+              disabled
+              v-model="local.state"
+              v-mask="'state'"
+              :invalid="!!getFieldError('state')"
+              placeholder="Ex.: CE"
+              @input="clearFieldError('state')"
+            />
+            <small v-if="getFieldError('state')" class="text-red-500 text-xs">{{ getFieldError('state') }}</small>
           </div>
           <div class="flex flex-col gap-1">
             <label>Área Total (ha)</label>
@@ -59,7 +95,7 @@
                     <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleProductionUnit(idx)">
                       <div class="title">
                         <i class="pi" :class="prop.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                        <span class="ml-4">Unidade de Produção {{ idx + 1 }} — {{ getCropName(prop.crop_id) || 'Sem cultura' }}</span>
+                        <span class="ml-4">Unidade de Produção {{ idx + 1 }} — {{ getCropName(prop.crop_name) || 'Sem cultura' }}</span>
                       </div>
                       <div class="actions">
                         <Button label="Danger" severity="danger" @click.stop="removeProductionUnit(idx)">
@@ -75,7 +111,7 @@
                             :options="CROPS"
                             optionLabel="name"
                             optionValue="id"
-                            v-model="prop.crop_id"
+                            v-model="prop.crop_name"
                             placeholder="Selecione uma cultura"
                             @change="onCropChange(idx, $event)"
                           />
@@ -107,7 +143,7 @@
                     <div class="bg-gray-100 flex justify-between items-center p-2 rounded-md" @click="toggleHerd(idx)">
                       <div class="title">
                         <i class="pi" :class="herd.open ? 'pi-angle-down' : 'pi-angle-right'"></i>
-                        <span class="ml-4">Rebanho {{ idx + 1 }} — {{ getSpeciesName(herd.species_id) || 'Sem espécie' }}</span>
+                        <span class="ml-4">Rebanho {{ idx + 1 }} — {{ getSpeciesName(herd.species) || 'Sem espécie' }}</span>
                       </div>
                       <div class="actions">
                         <Button label="Danger" severity="danger" @click.stop="removeHerd(idx)">
@@ -123,7 +159,7 @@
                             :options="SPECIES"
                             optionLabel="name"
                             optionValue="id"
-                            v-model="herd.species_id"
+                            v-model="herd.species"
                             placeholder="Selecione uma espécie"
                             @change="onSpeciesChange(idx, $event)"
                           />
@@ -167,6 +203,12 @@ import type { PropertyForm } from '@/types/property'
 import type { Producer } from '@/types/producer'
 import { useProducerStore } from '@/stores/producer'
 import { CROPS, SPECIES } from '@/data/cropsAndSpecies'
+// import FileUpload from 'primevue/fileupload'
+import { getAddressByCep } from '@/utils/cep'
+
+interface ValidationErrors {
+  [key: string]: string[]
+}
 
 const producerStore = useProducerStore()
 
@@ -178,16 +220,58 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', v: boolean): void
   (e: 'save', v: PropertyForm): void
+  (e: 'validation-error', v: ValidationErrors): void
 }>()
 
+const cep = ref('')
+const validationErrors = ref<ValidationErrors>({})
+
+
+const handleCepSearch = async () => {
+  const result = await getAddressByCep(cep.value)
+
+  if (!result.success) {
+    setValidationErrors({
+      cep: [result.error?.message || 'CEP inválido']
+    })
+    local.value.municipality = ''
+    local.value.state = ''
+    return
+  }
+
+  clearFieldError('cep')
+  local.value.municipality = result.data?.localidade || ''
+  local.value.state = result.data?.uf || ''
+}
 
 function close() {
+  validationErrors.value = {}
   emit('update:modelValue', false)
 }
 
 function submit() {
   emit('save', local.value)
 }
+
+function setValidationErrors(errors: ValidationErrors) {
+  validationErrors.value = errors
+  emit('validation-error', errors)
+}
+
+function clearFieldError(fieldName: string) {
+  if (validationErrors.value[fieldName]) {
+    delete validationErrors.value[fieldName]
+  }
+}
+
+function getFieldError(fieldName: string): string | undefined {
+  return validationErrors.value[fieldName]?.[0]
+}
+
+defineExpose({
+  setValidationErrors,
+  validationErrors
+})
 
 
 function addProductionUnit() {
@@ -223,6 +307,7 @@ const local = ref<PropertyForm>(props.value)
 watch(() => props.value, (nv) => {
   console.log(nv, 'nv')
   Object.assign(local.value, JSON.parse(JSON.stringify(nv)))
+  validationErrors.value = {}
 })
 
 const producers = ref<Producer[]>([])
@@ -232,7 +317,7 @@ onMounted(async () => {
 })
 
 // Funções para lidar com mudanças nos selects
-function onCropChange(index: number, event: any) {
+function onCropChange(index: number, event: { value: string }) {
   const cropId = event.value
   const prodUnit = local.value.productionUnits?.[index]
   if (prodUnit && cropId) {
@@ -243,7 +328,7 @@ function onCropChange(index: number, event: any) {
   }
 }
 
-function onSpeciesChange(index: number, event: any) {
+function onSpeciesChange(index: number, event: { value: string }) {
   const speciesId = event.value
   const herd = local.value.herds?.[index]
   if (herd && speciesId) {
@@ -255,12 +340,12 @@ function onSpeciesChange(index: number, event: any) {
 }
 
 // Funções auxiliares para obter nomes
-function getCropName(cropId: number | null | undefined): string | undefined {
-  if (!cropId) return undefined
-  return CROPS.find(crop => crop.id === cropId)?.name
+function getCropName(cropName: string | null | undefined): string | undefined {
+  if (!cropName) return undefined
+  return CROPS.find(crop => crop.name === cropName)?.name
 }
 
-function getSpeciesName(speciesId: number | null | undefined): string | undefined {
+function getSpeciesName(speciesId: string | null | undefined): string | undefined {
   if (!speciesId) return undefined
   return SPECIES.find(species => species.id === speciesId)?.name
 }

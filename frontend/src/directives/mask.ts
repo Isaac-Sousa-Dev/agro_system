@@ -14,6 +14,7 @@ function resolveMaxLength(preset: MaskPreset | ((v: unknown) => string) | undefi
     case 'state_registration': return 20
     case 'date': return 10 // DD/MM/YYYY
     case 'datetime': return 16 // DD/MM/YYYY HH:MM
+    case 'cep': return 9 // 99999-999
     default: return undefined
   }
 }

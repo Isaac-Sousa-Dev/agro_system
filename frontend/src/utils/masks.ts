@@ -102,8 +102,12 @@ export function formatDateTime(value: unknown): string {
   })
 }
 
+export function formatCep(value: unknown): string {
+  return toDigits(value).slice(0, 9).replace(/(\d{5})(\d{3})/, '$1-$2')
+}
+
 // Diretiva utilitária: aceita um preset string ou uma função (value)=>string
-export type MaskPreset = 'cpf_cnpj' | 'phone' | 'state' | 'state_registration' | 'decimal' | 'date' | 'datetime'
+export type MaskPreset = 'cpf_cnpj' | 'phone' | 'state' | 'state_registration' | 'decimal' | 'date' | 'datetime' | 'cep'
 
 export function getMaskFn(preset: MaskPreset | ((v: unknown) => string), options?: DecimalOptions) {
   if (typeof preset === 'function') return preset
@@ -115,6 +119,7 @@ export function getMaskFn(preset: MaskPreset | ((v: unknown) => string), options
     case 'decimal': return (v: unknown) => formatDecimal(v, options)
     case 'date': return formatDate
     case 'datetime': return formatDateTime
+    case 'cep': return formatCep
     default: return (v: unknown) => String(v ?? '')
   }
 }

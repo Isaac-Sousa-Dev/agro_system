@@ -17,6 +17,7 @@ class PropertyResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'image' => $this->image ? asset('storage/' . $this->image) : null,
             'municipality' => $this->municipality,
             'state' => $this->state,
             'state_registration' => $this->state_registration,

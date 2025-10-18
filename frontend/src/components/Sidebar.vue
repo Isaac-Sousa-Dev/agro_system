@@ -81,19 +81,19 @@
           </router-link>
         </li>
 
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <router-link to="/reports" class="nav-link" :title="collapsed ? 'Relatórios' : ''">
             <span class="nav-icon">
               <i class="pi pi-file"></i>
             </span>
             <span v-if="!collapsed" class="nav-text">Relatórios</span>
           </router-link>
-        </li>
+        </li> -->
       </ul>
     </nav>
 
     <div v-if="!collapsed" class="sidebar-footer">
-      <p class="footer-text">© 2024 Agro System</p>
+      <p class="footer-text">© 2025 Agro System</p>
       <p class="footer-version">v1.0.0</p>
     </div>
   </aside>

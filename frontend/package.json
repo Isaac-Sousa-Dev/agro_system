@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "@primevue/themes": "^4.4.1",
+    "apexcharts": "^5.3.5",
     "axios": "^1.12.2",
+    "chart.js": "^4.5.1",
     "js-cookie": "^3.0.5",
     "pinia": "^3.0.3",
     "primeicons": "^7.0.0",

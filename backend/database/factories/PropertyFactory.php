@@ -17,8 +17,8 @@ class PropertyFactory extends Factory
     {
         return [
             'name' => $this->faker->company() . ' Farm',
-            'municipality' => $this->faker->city(),
-            'state' => $this->faker->stateAbbr(),
+            'municipality' => $this->faker->randomElement(['Fortaleza', 'Caucaia', 'Juazeiro do Norte', 'Iguatu', 'Sobral', 'Quixadá', 'Pacajus']),
+            'state' => $this->faker->randomElement(['CE', 'PI', 'RN', 'PE', 'PB', 'SE', 'AL', 'BA', 'MA']),
             'state_registration' => $this->faker->optional()->bothify('SR-#####'),
             'total_area' => $this->faker->randomFloat(2, 1, 1000),
             'farmer_id' => Farmer::factory(),

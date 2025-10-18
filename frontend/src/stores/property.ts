@@ -19,7 +19,7 @@ export const usePropertyStore = defineStore('property', () => {
     loading.value = true;
     error.value = null;
     try {
-      const response = await api.get('/properties');
+      const response = await api.get('/properties', { params: {page, per_page: per}});
       const payload = response.data;
       if(payload && Array.isArray(payload.data)) {
         properties.value = payload.data;

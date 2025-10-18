@@ -1,14 +1,11 @@
 <?php
-
-use App\Exports\PropertiesExport;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\ProductionUnitController;
 use App\Http\Controllers\HerdController;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,8 +88,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/properties/export/preview', [PropertyController::class, 'exportPreview']);
     Route::apiResource('properties', PropertyController::class);
 
-
-
     // Production Units
     Route::apiResource('production-units', ProductionUnitController::class);
 
@@ -100,6 +95,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/herds/export/pdf', [HerdController::class, 'exportPdf']);
     Route::get('/herds/export/pdf/preview', [HerdController::class, 'exportPdfPreview']);
     Route::apiResource('herds', HerdController::class);
+
+    // Reports
+    Route::get('/reports/dashboard', [ReportController::class, 'dashboard']);
 });
 
 

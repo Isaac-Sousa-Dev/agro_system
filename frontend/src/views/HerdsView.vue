@@ -13,7 +13,12 @@
         </button>
       </div>
       <div class="toolbar-right">
-        <input class="form-input w-1/2" v-model="search" placeholder="Buscar por espécie ou propriedade (ID)..." />
+        <InputGroup>
+            <InputText fluid type="text" v-model="search" placeholder="Buscar por espécie ou propriedade..." />
+            <InputGroupAddon>
+                <span class="pi pi-search"></span>
+            </InputGroupAddon>
+        </InputGroup>
         <button class="btn-secondary" @click="load"><i class="pi pi-refresh"></i></button>
       </div>
     </div>
@@ -26,7 +31,6 @@
             <th>Espécie</th>
             <th>Quantidade</th>
             <th>Finalidade</th>
-            <th>Atualização</th>
             <th style="width:1%">Ações</th>
           </tr>
         </thead>
@@ -38,7 +42,6 @@
             <td>{{ h.species }}</td>
             <td>{{ h.quantity }}</td>
             <td>{{ h.purpose ?? '-' }}</td>
-            <td v-mask="'date'">{{ h.update_date ?? '-' }}</td>
             <td>
               <div class="row-actions">
                 <button class="icon" @click="openView(h)" title="Ver"><i class="pi pi-eye"></i></button>
@@ -90,6 +93,9 @@ import HerdEditModal from '@/components/modals/herd/HerdEditModal.vue'
 import HerdViewModal from '@/components/modals/herd/HerdViewModal.vue'
 import HerdDeleteModal from '@/components/modals/herd/HerdDeleteModal.vue'
 import Paginator from 'primevue/paginator';
+import InputGroup from 'primevue/inputgroup';
+import InputText from 'primevue/inputtext';
+import InputGroupAddon from 'primevue/inputgroupaddon';
 
 const store = useHerdStore()
 const toast = useToast()
@@ -116,7 +122,7 @@ const filtered = computed(() => {
   if (!search.value) return store.herds
   const q = search.value.toLowerCase()
   return store.herds.filter(herd =>
-    herd.species.toLowerCase().includes(q) || String(herd.property_id).includes(q)
+    herd.species.toLowerCase().includes(q) || herd.property?.name.toLowerCase().includes(q)
   )
 })
 

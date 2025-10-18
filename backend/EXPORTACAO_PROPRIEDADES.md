@@ -160,3 +160,4 @@ curl -H "Authorization: Bearer {token}" \
 - Laravel 10+
 - maatwebsite/excel 3.1+
 - PhpSpreadsheet (instalado automaticamente com maatwebsite/excel)
+

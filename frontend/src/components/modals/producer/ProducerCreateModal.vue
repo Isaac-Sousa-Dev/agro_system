@@ -5,11 +5,11 @@
       <form @submit.prevent="submit">
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
-            <label>Nome</label>
+            <label>Nome*</label>
             <InputText type="text" v-model="local.name" placeholder="Digite o nome do produtor" />
           </div>
           <div class="flex flex-col gap-1">
-            <label>CPF/CNPJ</label>
+            <label>CPF/CNPJ*</label>
             <InputText type="text" v-model="local.cpf_cnpj" v-mask="'cpf_cnpj'" placeholder="000.000.000-00" />
           </div>
           <div class="flex flex-col gap-1">

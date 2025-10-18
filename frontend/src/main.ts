@@ -30,6 +30,7 @@ app.use(PrimeVue, {
   }
 })
 
+
 // Initialize auth store
 const authStore = useAuthStore()
 authStore.fetchUser()

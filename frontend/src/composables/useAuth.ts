@@ -8,11 +8,11 @@ export function useAuth() {
 
   const login = async (credentials: { email: string; password: string }) => {
     const result = await authStore.login(credentials)
-    
+
     if (result.success) {
       router.push('/dashboard')
     }
-    
+
     return result
   }
 
@@ -36,7 +36,7 @@ export function useAuth() {
     loading: computed(() => authStore.loading),
     error: computed(() => authStore.error),
     // userInitials: computed(() => authStore.userInitials),
-    
+
     // Actions
     login,
     logout,

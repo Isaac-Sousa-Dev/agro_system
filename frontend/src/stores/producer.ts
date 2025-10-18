@@ -19,24 +19,22 @@ export const useProducerStore = defineStore('producer', () => {
         loading.value = true;
         error.value = null;
         try {
-            if(producers.value.length == 0) {
-              const response = await api.get('/farmers', { params: { page, per_page: per } });
-              const payload = response.data;
-              if (payload && Array.isArray(payload.data)) {
-                  producers.value = payload.data;
-                  currentPage.value = payload.current_page ?? page;
-                  lastPage.value = payload.last_page ?? 1;
-                  perPage.value = Number(payload.per_page ?? per ?? payload.data.length ?? 0);
-                  total.value = Number(payload.total ?? payload.data.length ?? 0);
-                  links.value = payload.links ?? [];
-              } else {
-                  producers.value = payload;
-                  currentPage.value = 1;
-                  lastPage.value = 1;
-                  perPage.value = payload?.length ?? 0;
-                  total.value = payload?.length ?? 0;
-                  links.value = [];
-              }
+            const response = await api.get('/farmers', { params: { page, per_page: per } });
+            const payload = response.data;
+            if (payload && Array.isArray(payload.data)) {
+                producers.value = payload.data;
+                currentPage.value = payload.current_page ?? page;
+                lastPage.value = payload.last_page ?? 1;
+                perPage.value = Number(payload.per_page ?? per ?? payload.data.length ?? 0);
+                total.value = Number(payload.total ?? payload.data.length ?? 0);
+                links.value = payload.links ?? [];
+            } else {
+                producers.value = payload;
+                currentPage.value = 1;
+                lastPage.value = 1;
+                perPage.value = payload?.length ?? 0;
+                total.value = payload?.length ?? 0;
+                links.value = [];
             }
             return producers.value;
         } catch (err: unknown) {

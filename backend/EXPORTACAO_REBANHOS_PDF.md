@@ -261,3 +261,4 @@ const previewPdf = async (farmerId = null) => {
 - **Herd**: species, quantity, purpose
 - **Property**: name, municipality, state
 - **Farmer**: name, cpf_cnpj, phone, email, address
+

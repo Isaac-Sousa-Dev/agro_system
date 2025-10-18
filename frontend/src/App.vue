@@ -1,3 +1,46 @@
+<template>
+  <div id="app">
+
+    <Sidebar
+      v-if="showSidebar"
+      :is-open="sidebarOpen"
+      @close="closeSidebar"
+    />
+
+    <header v-if="showSidebar && isMobile" class="mobile-header">
+      <button @click="toggleSidebar" class="menu-toggle">
+        <i class="pi pi-bars"></i>
+      </button>
+      <div class="mobile-logo">
+        <i class="pi pi-seedling"></i>
+        <h1>Agro System</h1>
+      </div>
+      <div class="mobile-spacer"></div>
+    </header>
+
+    <main class="main" :class="{
+        'with-sidebar': showSidebar && !isMobile,
+        'with-mobile-header': showSidebar && isMobile
+      }"
+    >
+      <Toast />
+      <div v-if="showSidebar" class="container">
+        <RouterView />
+      </div>
+      <div v-else class="container">
+        <RouterView />
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer v-if="showSidebar" class="footer">
+      <div class="container">
+        <p>&copy; 2025 Agro System - Sistema de Gestão Agropecuária</p>
+      </div>
+    </footer>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
@@ -37,49 +80,6 @@ onUnmounted(() => {
   window.removeEventListener('resize', checkIsMobile)
 })
 </script>
-
-<template>
-  <div id="app">
-
-    <Sidebar
-      v-if="showSidebar"
-      :is-open="sidebarOpen"
-      @close="closeSidebar"
-    />
-
-    <header v-if="showSidebar && isMobile" class="mobile-header">
-      <button @click="toggleSidebar" class="menu-toggle">
-        <i class="pi pi-bars"></i>
-      </button>
-      <div class="mobile-logo">
-        <i class="pi pi-seedling"></i>
-        <h1>Agro System</h1>
-      </div>
-      <div class="mobile-spacer"></div>
-    </header>
-
-    <main class="main" :class="{
-        'with-sidebar': showSidebar && !isMobile,
-        'with-mobile-header': showSidebar && isMobile
-      }"
-    >
-      <Toast />
-      <div v-if="showSidebar" class="container">
-        <RouterView />
-      </div>
-      <div v-else class="container">
-        <RouterView />
-      </div>
-    </main>
-
-    <!-- Footer -->
-    <footer v-if="showSidebar" class="footer">
-      <div class="container">
-        <p>&copy; 2024 Agro System - Sistema de Gestão Agropecuária</p>
-      </div>
-    </footer>
-  </div>
-</template>
 
 <style scoped>
 /* Header Mobile */

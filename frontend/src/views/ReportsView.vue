@@ -5,7 +5,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>📊 Relatórios</h1>
+      <h1>Relatórios</h1>
       <p>Gere relatórios detalhados e exporte dados do sistema</p>
     </div>
 

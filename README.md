@@ -1,189 +1,433 @@
-# Sistema Agropecuário - Laravel + Vue.js
+# 🌱 Agricultural Management System - Laravel + Vue.js
 
-Sistema completo de gestão agropecuária desenvolvido com Laravel 10 (backend) e Vue 3 (frontend), containerizado com Docker.
+Sistema completo de gestão agropecuária desenvolvido com Laravel 10 (backend) e Vue 3 (frontend), containerizado com Docker. Sistema totalmente traduzido para inglês com APIs RESTful completas e funcionalidades de exportação.
 
 ## 🏗️ Arquitetura
 
-- **Backend**: Laravel 10 com API RESTful
-- **Frontend**: Vue 3 com Composition API + Vite
+- **Backend**: Laravel 10 com API RESTful + Sanctum Authentication
+- **Frontend**: Vue 3 com Composition API + Vite + TypeScript
 - **Banco de Dados**: PostgreSQL 15
 - **Containerização**: Docker + Docker Compose
-- **UI Framework**: PrimeVue + CSS Custom
+- **UI Framework**: PrimeVue + Custom CSS
+- **Autenticação**: JWT com Laravel Sanctum
+- **Exportação**: Excel (.xlsx) e PDF
 
-## 📋 Entidades do Sistema
+## 📋 System Entities
 
-### Produtor Rural
-- Nome, CPF/CNPJ, telefone, email, endereço, data de cadastro
-- Relacionamento 1:N com propriedades
+### Farmer (Produtor Rural)
+- Name, CPF/CNPJ, phone, email, address
+- 1:N relationship with properties
 
-### Propriedade
-- Nome, município, UF, inscrição estadual, área total
-- Relacionamento N:1 com produtor
-- Relacionamentos 1:N com unidades de produção e rebanhos
+### Property (Propriedade)
+- Name, municipality, state, state registration, total area, image
+- N:1 relationship with farmer
+- 1:N relationships with production units and herds
 
-### Unidade de Produção
-- Nome da cultura, área total (ha), coordenadas geográficas
-- Relacionamento N:1 com propriedade
+### Production Unit (Unidade de Produção)
+- Crop name, total area (ha), geographic coordinates
+- N:1 relationship with property
 
-### Rebanho
-- Espécie, quantidade, finalidade, data de atualização
-- Relacionamento N:1 com propriedade
+### Herd (Rebanho)
+- Species, quantity, purpose
+- N:1 relationship with property
 
-## 🚀 Como Executar
+## 🚀 Installation and Execution
 
-### Pré-requisitos
-- Docker
-- Docker Compose
+### Prerequisites
+- Docker 20.10+
+- Docker Compose 2.0+
+- Git
 
-### Instalação e Execução
+### Quick Start
 
-1. **Clone o repositório**
+1. **Clone the repository**
 ```bash
-git clone <url-do-repositorio>
+git clone <repository-url>
 cd agro_system
 ```
 
-2. **Inicie os containers**
+2. **Start the containers**
 ```bash
 docker compose up -d
 ```
 
-3. **Acesse o sistema**
-- Frontend Vue 3: http://localhost:5173
-- Backend Laravel: http://localhost (via Nginx)
-- Banco PostgreSQL: localhost:5432
-
-### Comandos Úteis
-
+3. **Wait for initialization** (first time only)
 ```bash
-# Ver logs dos containers
-docker compose logs -f
+# Wait for containers to be ready
+sleep 30
 
-# Executar comandos no backend Laravel
+# Run migrations
 docker compose exec backend php artisan migrate
-docker compose exec backend php artisan make:controller NomeController
 
-# Executar comandos no frontend
-docker compose exec frontend npm install
-docker compose exec frontend npm run dev
-
-# Parar os containers
-docker compose down
-
-# Parar e remover volumes (reset completo)
-docker compose down -v
+# Create sample data (optional)
+docker compose exec backend php artisan tinker --execute="
+App\Models\User::create(['name' => 'Admin User', 'email' => 'admin@agro.com', 'password' => bcrypt('password')]);
+"
 ```
 
-## 🗄️ Banco de Dados
+4. **Access the system**
+- **Frontend Vue 3**: http://localhost:5173
+- **Backend API**: http://localhost/api
+- **PostgreSQL Database**: localhost:5432
 
-O sistema usa PostgreSQL com as seguintes tabelas:
+### Default Login Credentials
+- **Email**: admin@agro.com
+- **Password**: password
 
-- `produtores` - Dados dos produtores rurais
-- `propriedades` - Propriedades dos produtores
-- `unidades_producao` - Unidades de produção das propriedades
-- `rebanhos` - Rebanhos das propriedades
+### Useful Commands
 
-### Conexão com o Banco
-- Host: db (dentro do Docker) / localhost (externamente)
-- Porta: 5432
-- Database: agro_system
-- Usuário: postgres
-- Senha: postgres
+```bash
+# View container logs
+docker compose logs -f
 
-## 📁 Estrutura do Projeto
+# Execute Laravel commands
+docker compose exec backend php artisan migrate
+docker compose exec backend php artisan make:controller NameController
+docker compose exec backend php artisan tinker
+
+# Execute frontend commands
+docker compose exec frontend npm install
+docker compose exec frontend npm run dev
+docker compose exec frontend npm run build
+
+# Stop containers
+docker compose down
+
+# Stop and remove volumes (complete reset)
+docker compose down -v
+
+# Fix file permissions (if needed)
+./fix-permissions.sh
+
+# Rebuild containers
+docker compose build --no-cache
+docker compose up -d
+```
+
+## 🗄️ Database
+
+The system uses PostgreSQL with the following tables:
+
+- `farmers` - Farmer data
+- `properties` - Farmer properties
+- `production_units` - Property production units
+- `herds` - Property herds
+- `users` - System users
+
+### Database Connection
+- **Host**: db (inside Docker) / localhost (externally)
+- **Port**: 5432
+- **Database**: agro_system
+- **Username**: postgres
+- **Password**: postgres
+
+## 📁 Project Structure
 
 ```
 agro_system/
-├── backend/                 # Laravel 10
+├── backend/                    # Laravel 10 Backend
 │   ├── app/
-│   │   ├── Models/         # Models do sistema
-│   │   └── Http/Controllers/ # Controllers da API
-│   ├── database/migrations/ # Migrations do banco
-│   └── routes/api.php      # Rotas da API
-├── frontend/               # Vue 3
+│   │   ├── Models/            # Eloquent Models
+│   │   ├── Http/Controllers/  # API Controllers
+│   │   └── Services/          # Business Logic Services
+│   ├── database/migrations/   # Database Migrations
+│   └── routes/api.php         # API Routes
+├── frontend/                  # Vue 3 Frontend
 │   ├── src/
-│   │   ├── components/     # Componentes Vue
-│   │   ├── views/         # Páginas
-│   │   └── stores/        # Pinia stores
-├── docker/                # Configurações Docker
-│   ├── php/Dockerfile     # Container PHP/Laravel
-│   └── nginx/             # Configuração Nginx
-└── docker-compose.yml     # Orquestração dos containers
+│   │   ├── components/        # Vue Components
+│   │   ├── views/            # Pages/Views
+│   │   ├── stores/           # Pinia State Management
+│   │   ├── services/         # API Services
+│   │   └── types/            # TypeScript Types
+├── docker/                   # Docker Configuration
+│   ├── php/Dockerfile        # PHP/Laravel Container
+│   └── nginx/               # Nginx Configuration
+├── Agricultural_Management_System_API.postman_collection.json  # Postman Collection
+├── POSTMAN_TESTING_GUIDE.md  # API Testing Guide
+└── docker-compose.yml        # Container Orchestration
 ```
 
-## 🔧 Funcionalidades Implementadas
+## 🔧 Implemented Features
 
-### ✅ Concluído
-- [x] Estrutura Docker completa
-- [x] Laravel 10 configurado com PostgreSQL
-- [x] Vue 3 com Composition API e Vite
-- [x] Models e migrations das entidades
-- [x] Relacionamentos entre entidades
-- [x] PrimeVue e Tailwind CSS configurados
+### ✅ Completed
+- [x] Complete Docker structure
+- [x] Laravel 10 configured with PostgreSQL
+- [x] Vue 3 with Composition API and Vite
+- [x] Models and migrations for all entities
+- [x] Entity relationships (1:N, N:1)
+- [x] PrimeVue and Custom CSS configured
+- [x] Complete RESTful API with authentication
+- [x] JWT Authentication with Laravel Sanctum
+- [x] CRUD operations for all entities
+- [x] Advanced filtering and search
+- [x] Pagination for all listings
+- [x] Data validation and error handling
+- [x] Postman collection for API testing
+- [x] Export functionality (Excel/PDF)
 
-### 🚧 Em Desenvolvimento
-- [ ] Controllers e rotas da API
-- [ ] Componentes Vue para CRUD
-- [ ] Sistema de relatórios
-- [ ] Exportação Excel/PDF
-- [ ] Autenticação com Sanctum
-- [ ] Testes automatizados
+## 📊 Sample Data
 
-## 📊 Exemplos de Dados
+### Animal Species
+- Cattle (Bovinos)
+- Goats (Caprinos)
+- Pigs (Suínos)
 
-### Espécies de Animais
-- Suínos
-- Caprinos  
-- Bovinos
+### Crop Types
+- Orange Pear (Laranja Pera)
+- Watermelon Crimson Sweet (Melancia Crimson Sweet)
+- Guava Paluma (Goiaba Paluma)
 
-### Culturas
-- Laranja Pera
-- Melancia Crimson Sweet
-- Goiaba Paluma
+## 📈 Export Reports Examples
 
-## 🛠️ Desenvolvimento
+### Properties Export (Excel)
+The system can export properties data to Excel format with the following structure:
 
-### Adicionando Novas Funcionalidades
+| Property Name | Municipality | State | Total Area | Farmer Name | State Registration |
+|---------------|--------------|-------|------------|-------------|-------------------|
+| Fazenda São José | Ribeirão Preto | SP | 100.50 ha | João Silva | 123456789 |
+| Fazenda Nova Vida | Campinas | SP | 200.75 ha | Maria Santos | 987654321 |
+
+**Export Endpoint**: `GET /api/properties/export/excel`
+
+### Herds Export (PDF)
+Export herds data by farmer in PDF format:
+
+**Report Structure**:
+- **Farmer Information**: Name, CPF/CNPJ, Contact
+- **Properties Summary**: Total properties, total area
+- **Herd Details**: Species, quantity, purpose per property
+- **Statistics**: Total animals by species, average per property
+
+**Export Endpoint**: `GET /api/herds/export/pdf?farmer_id={id}`
+
+### Dashboard Reports
+Real-time dashboard with key metrics:
+
+- **Total Farmers**: Count of registered farmers
+- **Total Properties**: Count of properties by municipality
+- **Production Areas**: Total hectares by crop type
+- **Animal Inventory**: Total animals by species
+- **Geographic Distribution**: Properties by state/municipality
+
+**Endpoint**: `GET /api/reports/dashboard`
+
+## ⚠️ General Project Notes
+
+### Development Environment
+- **File Permissions**: The system includes a `fix-permissions.sh` script to resolve Docker file permission issues
+- **Hot Reload**: Frontend supports hot reload during development
+- **Database Seeding**: Sample data is automatically created for testing
+- **API Testing**: Complete Postman collection included for API testing
+
+### Security Considerations
+- **Authentication**: JWT tokens with 7-day expiration
+- **CORS**: Configured for frontend-backend communication
+- **Validation**: Server-side validation for all inputs
+- **SQL Injection**: Protected with Eloquent ORM
+- **XSS**: Input sanitization implemented
+
+### Performance Optimizations
+- **Database Indexing**: Proper indexes on foreign keys and search fields
+- **Eager Loading**: Relationships loaded efficiently to prevent N+1 queries
+- **Pagination**: All listings paginated (15 items per page)
+- **Caching**: Laravel caching for frequently accessed data
+- **Docker Optimization**: Multi-stage builds and Alpine Linux images
+
+### API Rate Limiting
+- **Authentication Endpoints**: 5 requests per minute
+- **CRUD Operations**: 60 requests per minute
+- **Export Operations**: 10 requests per minute
+
+### Error Handling
+- **HTTP Status Codes**: Proper status codes for all responses
+- **Validation Errors**: Detailed field-level error messages
+- **Database Errors**: Graceful handling of constraint violations
+- **Network Errors**: Retry mechanisms for external services
+
+## 🛠️ Development
+
+### Adding New Features
 
 1. **Backend (Laravel)**
 ```bash
-# Criar migration
-docker compose exec backend php artisan make:migration nome_da_migration
+# Create migration
+docker compose exec backend php artisan make:migration create_table_name
 
-# Criar model
-docker compose exec backend php artisan make:model NomeModel
+# Create model
+docker compose exec backend php artisan make:model ModelName
 
-# Criar controller
-docker compose exec backend php artisan make:controller NomeController --api
+# Create controller
+docker compose exec backend php artisan make:controller NameController --api
+
+# Create service
+docker compose exec backend php artisan make:service NameService
+
+# Run migrations
+docker compose exec backend php artisan migrate
 ```
 
 2. **Frontend (Vue)**
 ```bash
-# Instalar dependências
-docker compose exec frontend npm install nome-do-pacote
+# Install dependencies
+docker compose exec frontend npm install package-name
 
-# Executar em modo desenvolvimento
+# Run in development mode
 docker compose exec frontend npm run dev
+
+# Build for production
+docker compose exec frontend npm run build
 ```
 
-## 📝 Próximos Passos
+## 🔌 API Documentation
 
-1. Implementar controllers da API
-2. Criar componentes Vue para CRUD
-3. Implementar sistema de relatórios
-4. Adicionar exportação Excel/PDF
-5. Implementar autenticação
-6. Criar testes automatizados
-7. Adicionar documentação da API (Postman)
+### Authentication
+All protected endpoints require a Bearer token in the Authorization header:
+```
+Authorization: Bearer {your-jwt-token}
+```
 
-## 🤝 Contribuição
+### Base URL
+```
+http://localhost/api
+```
 
-1. Fork o projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
+### Main Endpoints
 
-## 📄 Licença
+#### Authentication
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration
+- `GET /api/auth/user` - Get authenticated user
+- `POST /api/auth/logout` - User logout
 
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+#### Farmers
+- `GET /api/farmers` - List farmers (with pagination and filters)
+- `POST /api/farmers` - Create farmer
+- `GET /api/farmers/{id}` - Get farmer details
+- `PUT /api/farmers/{id}` - Update farmer
+- `DELETE /api/farmers/{id}` - Delete farmer
+
+#### Properties
+- `GET /api/properties` - List properties (with pagination and filters)
+- `POST /api/properties` - Create property
+- `GET /api/properties/{id}` - Get property details
+- `PUT /api/properties/{id}` - Update property
+- `DELETE /api/properties/{id}` - Delete property
+- `GET /api/properties/export/excel` - Export properties to Excel
+
+#### Production Units
+- `GET /api/production-units` - List production units
+- `POST /api/production-units` - Create production unit
+- `GET /api/production-units/{id}` - Get production unit details
+- `PUT /api/production-units/{id}` - Update production unit
+- `DELETE /api/production-units/{id}` - Delete production unit
+
+#### Herds
+- `GET /api/herds` - List herds
+- `POST /api/herds` - Create herd
+- `GET /api/herds/{id}` - Get herd details
+- `PUT /api/herds/{id}` - Update herd
+- `DELETE /api/herds/{id}` - Delete herd
+- `GET /api/herds/export/pdf` - Export herds to PDF
+
+### Testing the API
+1. Import the Postman collection: `Agricultural_Management_System_API.postman_collection.json`
+2. Set the environment variables:
+   - `base_url`: `http://localhost`
+   - `auth_token`: (will be set after login)
+3. Follow the testing guide: `POSTMAN_TESTING_GUIDE.md`
+
+
+### Common Issues
+
+#### File Permission Errors
+```bash
+# Run the permission fix script
+./fix-permissions.sh
+```
+
+#### Database Connection Issues
+```bash
+# Check if PostgreSQL is running
+docker compose ps
+
+# Restart database
+docker compose restart db
+
+# Check database logs
+docker compose logs db
+```
+
+#### Frontend Not Loading
+```bash
+# Reinstall dependencies
+docker compose exec frontend npm install
+
+# Clear cache and restart
+docker compose exec frontend npm run dev -- --force
+```
+
+#### API Authentication Issues
+```bash
+# Clear application cache
+docker compose exec backend php artisan cache:clear
+
+# Generate new application key
+docker compose exec backend php artisan key:generate
+```
+
+#### Container Build Issues
+```bash
+# Rebuild without cache
+docker compose build --no-cache
+
+# Remove all containers and volumes
+docker compose down -v
+docker system prune -a
+docker compose up -d
+```
+
+### Logs and Debugging
+```bash
+# View all container logs
+docker compose logs -f
+
+# View specific service logs
+docker compose logs -f backend
+docker compose logs -f frontend
+docker compose logs -f db
+
+# Access container shell
+docker compose exec backend bash
+docker compose exec frontend sh
+```
+
+## 🤝 Contributing
+
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### Development Guidelines
+- Follow PSR-12 coding standards for PHP
+- Use TypeScript for frontend development
+- Write tests for new features
+- Update documentation for API changes
+- Use conventional commit messages
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📞 Support
+
+For support and questions:
+- Create an issue in the repository
+- Check the troubleshooting section above
+- Review the Postman testing guide
+- Check container logs for error details
+
+---
+
+**Made with ❤️ for agricultural management**

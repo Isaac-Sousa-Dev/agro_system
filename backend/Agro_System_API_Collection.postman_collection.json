@@ -1,0 +1,1100 @@
+{
+	"info": {
+		"_postman_id": "agro-system-api-collection",
+		"name": "Agro System API - Collection Completa",
+		"description": "Collection completa para todas as APIs do Sistema de Gestão Agropecuária",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "agro-system"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@agro.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Faz login do usuário e retorna o token de autenticação"
+					},
+					"response": []
+				},
+				{
+					"name": "User Registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"João Silva\",\n    \"email\": \"joao@agro.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registra um novo usuário no sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Logged in User Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"user"
+							]
+						},
+						"description": "Retorna os dados do usuário autenticado"
+					},
+					"response": []
+				},
+				{
+					"name": "User Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Faz logout do usuário e invalida o token"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Farmers",
+			"item": [
+				{
+					"name": "List Farmers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/farmers?page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"farmers"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Lista todos os produtores com paginação"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Farmer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"João Silva\",\n    \"cpf_cnpj\": \"123.456.789-00\",\n    \"phone\": \"(85) 99999-9999\",\n    \"email\": \"joao@email.com\",\n    \"address\": \"Rua das Flores, 123 - Fortaleza/CE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/farmers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"farmers"
+							]
+						},
+						"description": "Cria um novo produtor"
+					},
+					"response": []
+				},
+				{
+					"name": "View Farmer",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/farmers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"farmers",
+								"1"
+							]
+						},
+						"description": "Visualiza os dados de um produtor específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Farmer",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"João Silva Santos\",\n    \"cpf_cnpj\": \"123.456.789-00\",\n    \"phone\": \"(85) 98888-8888\",\n    \"email\": \"joao.santos@email.com\",\n    \"address\": \"Rua das Flores, 456 - Fortaleza/CE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/farmers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"farmers",
+								"1"
+							]
+						},
+						"description": "Atualiza os dados de um produtor"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Farmer",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/farmers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"farmers",
+								"1"
+							]
+						},
+						"description": "Deleta um produtor"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Properties",
+			"item": [
+				{
+					"name": "List Properties",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/properties?page=1&search=&municipality=&state=&farmer_id=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "municipality",
+									"value": ""
+								},
+								{
+									"key": "state",
+									"value": ""
+								},
+								{
+									"key": "farmer_id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Lista todas as propriedades com filtros opcionais"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Property",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Fazenda São João\",\n    \"farmer_id\": 1,\n    \"municipality\": \"Fortaleza\",\n    \"state\": \"CE\",\n    \"state_registration\": \"123456789\",\n    \"total_area\": \"100.50\",\n    \"productionUnits\": [\n        {\n            \"crop_name\": \"Laranja Pera\",\n            \"total_area_ha\": \"50.25\",\n            \"geographic_coordinates\": \"-3.7172,-38.5434\"\n        }\n    ],\n    \"herds\": [\n        {\n            \"species\": \"Bovino\",\n            \"quantity\": 25,\n            \"purpose\": \"Corte\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties"
+							]
+						},
+						"description": "Cria uma nova propriedade com unidades de produção e rebanhos"
+					},
+					"response": []
+				},
+				{
+					"name": "View Property",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/properties/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"1"
+							]
+						},
+						"description": "Visualiza os dados de uma propriedade específica"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Property",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Fazenda São João Atualizada\",\n    \"farmer_id\": 1,\n    \"municipality\": \"Fortaleza\",\n    \"state\": \"CE\",\n    \"state_registration\": \"123456789\",\n    \"total_area\": \"150.75\",\n    \"productionUnits\": [\n        {\n            \"crop_name\": \"Laranja Pera\",\n            \"total_area_ha\": \"75.25\",\n            \"geographic_coordinates\": \"-3.7172,-38.5434\"\n        }\n    ],\n    \"herds\": [\n        {\n            \"species\": \"Bovino\",\n            \"quantity\": 30,\n            \"purpose\": \"Corte\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"1"
+							]
+						},
+						"description": "Atualiza os dados de uma propriedade"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Property",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/properties/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"1"
+							]
+						},
+						"description": "Deleta uma propriedade"
+					},
+					"response": []
+				},
+				{
+					"name": "Export Properties (Excel)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/properties/export/excel?search=&municipality=&state=&farmer_id=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"export",
+								"excel"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "municipality",
+									"value": ""
+								},
+								{
+									"key": "state",
+									"value": ""
+								},
+								{
+									"key": "farmer_id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Exporta propriedades para Excel com filtros opcionais"
+					},
+					"response": []
+				},
+				{
+					"name": "Preview Properties Export",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/properties/export/preview?search=&municipality=&state=&farmer_id=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"export",
+								"preview"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "municipality",
+									"value": ""
+								},
+								{
+									"key": "state",
+									"value": ""
+								},
+								{
+									"key": "farmer_id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Preview dos dados que serão exportados para Excel"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Production Units",
+			"item": [
+				{
+					"name": "List Production Units",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/production-units?page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"production-units"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Lista todas as unidades de produção com paginação"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Production Unit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"crop_name\": \"Laranja Pera\",\n    \"total_area_ha\": \"50.25\",\n    \"geographic_coordinates\": \"-3.7172,-38.5434\",\n    \"property_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/production-units",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"production-units"
+							]
+						},
+						"description": "Cria uma nova unidade de produção"
+					},
+					"response": []
+				},
+				{
+					"name": "View Production Unit",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/production-units/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"production-units",
+								"1"
+							]
+						},
+						"description": "Visualiza os dados de uma unidade de produção específica"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Production Unit",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"crop_name\": \"Laranja Pera\",\n    \"total_area_ha\": \"75.50\",\n    \"geographic_coordinates\": \"-3.7172,-38.5434\",\n    \"property_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/production-units/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"production-units",
+								"1"
+							]
+						},
+						"description": "Atualiza os dados de uma unidade de produção"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Production Unit",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/production-units/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"production-units",
+								"1"
+							]
+						},
+						"description": "Deleta uma unidade de produção"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Herds",
+			"item": [
+				{
+					"name": "List Herds",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/herds?page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Lista todos os rebanhos com paginação"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Herd",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"species\": \"Bovino\",\n    \"quantity\": 25,\n    \"property_id\": 1,\n    \"purpose\": \"Corte\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/herds",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds"
+							]
+						},
+						"description": "Cria um novo rebanho"
+					},
+					"response": []
+				},
+				{
+					"name": "View Herd",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/herds/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds",
+								"1"
+							]
+						},
+						"description": "Visualiza os dados de um rebanho específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Herd",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"species\": \"Bovino\",\n    \"quantity\": 30,\n    \"property_id\": 1,\n    \"purpose\": \"Leite\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/herds/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds",
+								"1"
+							]
+						},
+						"description": "Atualiza os dados de um rebanho"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Herd",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/herds/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds",
+								"1"
+							]
+						},
+						"description": "Deleta um rebanho"
+					},
+					"response": []
+				},
+				{
+					"name": "Export Herds (PDF)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/pdf"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/herds/export/pdf?farmer_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds",
+								"export",
+								"pdf"
+							],
+							"query": [
+								{
+									"key": "farmer_id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Exporta rebanhos para PDF por produtor"
+					},
+					"response": []
+				},
+				{
+					"name": "Preview Exportação Rebanhos (PDF)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/herds/export/pdf/preview?farmer_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"herds",
+								"export",
+								"pdf",
+								"preview"
+							],
+							"query": [
+								{
+									"key": "farmer_id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Preview dos dados que serão exportados para PDF"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/dashboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"dashboard"
+							]
+						},
+						"description": "Retorna dados estatísticos para o dashboard"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API Information",
+			"item": [
+				{
+					"name": "API Information",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								""
+							]
+						},
+						"description": "Retorna informações sobre a API e todos os endpoints disponíveis"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

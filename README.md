@@ -121,32 +121,6 @@ The system uses PostgreSQL with the following tables:
 - **Username**: postgres
 - **Password**: postgres
 
-## 📁 Project Structure
-
-```
-agro_system/
-├── backend/                    # Laravel 10 Backend
-│   ├── app/
-│   │   ├── Models/            # Eloquent Models
-│   │   ├── Http/Controllers/  # API Controllers
-│   │   └── Services/          # Business Logic Services
-│   ├── database/migrations/   # Database Migrations
-│   └── routes/api.php         # API Routes
-├── frontend/                  # Vue 3 Frontend
-│   ├── src/
-│   │   ├── components/        # Vue Components
-│   │   ├── views/            # Pages/Views
-│   │   ├── stores/           # Pinia State Management
-│   │   ├── services/         # API Services
-│   │   └── types/            # TypeScript Types
-├── docker/                   # Docker Configuration
-│   ├── php/Dockerfile        # PHP/Laravel Container
-│   └── nginx/               # Nginx Configuration
-├── Agricultural_Management_System_API.postman_collection.json  # Postman Collection
-├── POSTMAN_TESTING_GUIDE.md  # API Testing Guide
-└── docker-compose.yml        # Container Orchestration
-```
-
 ## 🔧 Implemented Features
 
 ### ✅ Completed
@@ -164,6 +138,7 @@ agro_system/
 - [x] Data validation and error handling
 - [x] Postman collection for API testing
 - [x] Export functionality (Excel/PDF)
+- [x] Unit tests implemented
 
 ## 📊 Sample Data
 
@@ -335,98 +310,6 @@ http://localhost/api
    - `base_url`: `http://localhost`
    - `auth_token`: (will be set after login)
 3. Follow the testing guide: `POSTMAN_TESTING_GUIDE.md`
-
-
-### Common Issues
-
-#### File Permission Errors
-```bash
-# Run the permission fix script
-./fix-permissions.sh
-```
-
-#### Database Connection Issues
-```bash
-# Check if PostgreSQL is running
-docker compose ps
-
-# Restart database
-docker compose restart db
-
-# Check database logs
-docker compose logs db
-```
-
-#### Frontend Not Loading
-```bash
-# Reinstall dependencies
-docker compose exec frontend npm install
-
-# Clear cache and restart
-docker compose exec frontend npm run dev -- --force
-```
-
-#### API Authentication Issues
-```bash
-# Clear application cache
-docker compose exec backend php artisan cache:clear
-
-# Generate new application key
-docker compose exec backend php artisan key:generate
-```
-
-#### Container Build Issues
-```bash
-# Rebuild without cache
-docker compose build --no-cache
-
-# Remove all containers and volumes
-docker compose down -v
-docker system prune -a
-docker compose up -d
-```
-
-### Logs and Debugging
-```bash
-# View all container logs
-docker compose logs -f
-
-# View specific service logs
-docker compose logs -f backend
-docker compose logs -f frontend
-docker compose logs -f db
-
-# Access container shell
-docker compose exec backend bash
-docker compose exec frontend sh
-```
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow PSR-12 coding standards for PHP
-- Use TypeScript for frontend development
-- Write tests for new features
-- Update documentation for API changes
-- Use conventional commit messages
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Support
-
-For support and questions:
-- Create an issue in the repository
-- Check the troubleshooting section above
-- Review the Postman testing guide
-- Check container logs for error details
 
 ---
 

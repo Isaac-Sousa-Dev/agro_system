@@ -63,6 +63,11 @@ docker compose exec backend php artisan migrate
 docker compose exec backend php artisan tinker --execute="
 App\Models\User::create(['name' => 'Admin User', 'email' => 'admin@agro.com', 'password' => bcrypt('password')]);
 "
+
+#OR (to create fake data)
+docker compose exec backend php artisan migrate --seed
+
+
 ```
 
 4. **Access the system**
@@ -219,39 +224,6 @@ Real-time dashboard with key metrics:
 - **Database Errors**: Graceful handling of constraint violations
 - **Network Errors**: Retry mechanisms for external services
 
-## 🛠️ Development
-
-### Adding New Features
-
-1. **Backend (Laravel)**
-```bash
-# Create migration
-docker compose exec backend php artisan make:migration create_table_name
-
-# Create model
-docker compose exec backend php artisan make:model ModelName
-
-# Create controller
-docker compose exec backend php artisan make:controller NameController --api
-
-# Create service
-docker compose exec backend php artisan make:service NameService
-
-# Run migrations
-docker compose exec backend php artisan migrate
-```
-
-2. **Frontend (Vue)**
-```bash
-# Install dependencies
-docker compose exec frontend npm install package-name
-
-# Run in development mode
-docker compose exec frontend npm run dev
-
-# Build for production
-docker compose exec frontend npm run build
-```
 
 ## 🔌 API Documentation
 

@@ -21,13 +21,24 @@ class FarmerRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255',
-            'cpf_cnpj' => 'required|string|unique:farmers,cpf_cnpj',
-            'phone' => 'nullable|string|max:20|unique:farmers,phone',
-            'email' => 'nullable|email|max:255|unique:farmers,email',
-            'address' => 'nullable|string'
-        ];
+        if($this->isMethod('post')){
+            return [
+                'name' => 'required|string|max:255',
+                'cpf_cnpj' => 'required|string|unique:farmers,cpf_cnpj',
+                'phone' => 'nullable|string|max:20|unique:farmers,phone',
+                'email' => 'nullable|email|max:255|unique:farmers,email',
+                'address' => 'nullable|string'
+            ];
+        } else {
+            return [
+                'name' => 'required|string|max:255',
+                'cpf_cnpj' => 'required|string|unique:farmers,cpf_cnpj,' . $this->route('farmer')->id,
+                'phone' => 'nullable|string|max:20|unique:farmers,phone,' . $this->route('farmer')->id,
+                'email' => 'nullable|email|max:255|unique:farmers,email,' . $this->route('farmer')->id,
+                'address' => 'nullable|string'
+            ];
+        }
+
     }
 
     public function messages(): array

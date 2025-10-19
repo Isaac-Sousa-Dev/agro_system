@@ -97,16 +97,27 @@
                     <div v-show="prop.open" class="mt-3 p-2">
                       <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col gap-1">
+                          <label>CEP</label>
+                          <InputText
+                            type="text"
+                            v-model="ceps[idx]"
+                            v-mask="'cep'"
+                            placeholder="Ex.: 61600-000"
+                            @blur="handleCepSearch(idx)"
+                          />
+                          <small v-if="propertyCepErrors[idx]" class="text-red-500 text-xs">{{ propertyCepErrors[idx] }}</small>
+                        </div>
+                        <div class="flex flex-col gap-1">
                           <label>Nome</label>
                           <InputText type="text" v-model="prop.name" placeholder="Ex.: Fazenda São João" />
                         </div>
                         <div class="flex flex-col gap-1">
                           <label>Município</label>
-                          <InputText type="text" v-model="prop.municipality" placeholder="Ex.: Viçosa do Ceará" />
+                          <InputText disabled type="text" v-model="prop.municipality" placeholder="Ex.: Viçosa do Ceará" />
                         </div>
                         <div class="flex flex-col gap-1">
                           <label>UF</label>
-                          <InputText type="text" v-model="prop.state" v-mask="'state'" maxlength="2" placeholder="UF" />
+                          <InputText disabled type="text" v-model="prop.state" v-mask="'state'" maxlength="2" placeholder="UF" />
                         </div>
                         <div class="flex flex-col gap-1">
                           <label>Inscrição Estadual</label>
@@ -143,6 +154,7 @@ import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
 import Button from 'primevue/button'
 import type { ProducerForm } from '@/types/producer'
+import { getAddressByCep } from '@/utils/cep'
 
 interface ValidationErrors {
   [key: string]: string[]
@@ -161,6 +173,8 @@ const emit = defineEmits<{
 
 const local = ref<ProducerForm>(props.value)
 const validationErrors = ref<ValidationErrors>({})
+const ceps = ref<string[]>([])
+const propertyCepErrors = ref<string[]>([])
 
 watch(() => props.value, (nv) => {
   console.log(nv, 'nv')
@@ -178,16 +192,40 @@ function submit() {
 
 function addProperty() {
   local.value.properties.push({ name: '', municipality: '', state: '', state_registration: '', total_area: '', open: true, productionUnits: [], herds: [] })
+  ceps.value.push('')
+  propertyCepErrors.value.push('')
 }
 
 function removeProperty(index: number) {
   local.value.properties.splice(index, 1)
+  ceps.value.splice(index, 1)
+  propertyCepErrors.value.splice(index, 1)
 }
 
 function toggleProperty(index: number) {
   const item = local.value.properties[index]
   if (!item) return
   item.open = !item.open
+}
+
+async function handleCepSearch(index: number) {
+  const cepValue = ceps.value[index] || ''
+  const result = await getAddressByCep(cepValue)
+  if (!result.success) {
+    propertyCepErrors.value[index] = result.error?.message || 'CEP inválido'
+    const item = local.value.properties[index]
+    if (item) {
+      item.municipality = ''
+      item.state = ''
+    }
+    return
+  }
+  propertyCepErrors.value[index] = ''
+  const item = local.value.properties[index]
+  if (item) {
+    item.municipality = result.data?.localidade || ''
+    item.state = result.data?.uf || ''
+  }
 }
 
 function setValidationErrors(errors: ValidationErrors) {
